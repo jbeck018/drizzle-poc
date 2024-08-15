@@ -1,0 +1,19 @@
+services:
+  # postgres:
+  #   container_name: postgres-drizzle
+  #   image: postgres
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=graphql
+  #   ports:
+  #     - 5432:5432
+  postgres:
+    container_name: hydra-drizzle
+    image: ghcr.io/hydradatabase/hydra:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=graphql
+    ports:
+      - 5432:5432
