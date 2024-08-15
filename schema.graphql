@@ -1,0 +1,903 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+input EventsContentFilters {
+  OR: [EventsContentfiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsContentfiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsCreatedAtFilters {
+  OR: [EventsCreatedAtfiltersOr!]
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsCreatedAtfiltersOr {
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+enum EventsEventTypeEnum {
+  """Value: bounce"""
+  bounce
+  """Value: click"""
+  click
+  """Value: logged_in"""
+  logged_in
+  """Value: page_view"""
+  page_view
+  """Value: signed_up"""
+  signed_up
+  """Value: subscribed"""
+  subscribed
+}
+
+input EventsEventTypeFilters {
+  OR: [EventsEventTypefiltersOr!]
+  eq: EventsEventTypeEnum
+  gt: EventsEventTypeEnum
+  gte: EventsEventTypeEnum
+  ilike: String
+  """Array<undefined>"""
+  inArray: [EventsEventTypeEnum!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: EventsEventTypeEnum
+  lte: EventsEventTypeEnum
+  ne: EventsEventTypeEnum
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [EventsEventTypeEnum!]
+  notLike: String
+}
+
+input EventsEventTypefiltersOr {
+  eq: EventsEventTypeEnum
+  gt: EventsEventTypeEnum
+  gte: EventsEventTypeEnum
+  ilike: String
+  """Array<undefined>"""
+  inArray: [EventsEventTypeEnum!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: EventsEventTypeEnum
+  lte: EventsEventTypeEnum
+  ne: EventsEventTypeEnum
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [EventsEventTypeEnum!]
+  notLike: String
+}
+
+input EventsFilters {
+  OR: [EventsFiltersOr!]
+  content: EventsContentFilters
+  createdAt: EventsCreatedAtFilters
+  eventType: EventsEventTypeFilters
+  id: EventsIdFilters
+  updatedAt: EventsUpdatedAtFilters
+  url: EventsUrlFilters
+  userId: EventsUserIdFilters
+}
+
+input EventsFiltersOr {
+  content: EventsContentFilters
+  createdAt: EventsCreatedAtFilters
+  eventType: EventsEventTypeFilters
+  id: EventsIdFilters
+  updatedAt: EventsUpdatedAtFilters
+  url: EventsUrlFilters
+  userId: EventsUserIdFilters
+}
+
+input EventsIdFilters {
+  OR: [EventsIdfiltersOr!]
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+input EventsIdfiltersOr {
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+input EventsInsertInput {
+  content: String!
+  """Date"""
+  createdAt: String
+  eventType: EventsEventTypeEnum
+  id: Int
+  """Date"""
+  updatedAt: String
+  url: String
+  userId: Int!
+}
+
+type EventsItem {
+  content: String!
+  """Date"""
+  createdAt: String!
+  eventType: EventsEventTypeEnum
+  id: Int!
+  """Date"""
+  updatedAt: String!
+  url: String
+  userId: Int!
+}
+
+input EventsOrderBy {
+  content: InnerOrder
+  createdAt: InnerOrder
+  eventType: InnerOrder
+  id: InnerOrder
+  updatedAt: InnerOrder
+  url: InnerOrder
+  userId: InnerOrder
+}
+
+type EventsSelectItem {
+  content: String!
+  """Date"""
+  createdAt: String!
+  eventType: EventsEventTypeEnum
+  id: Int!
+  """Date"""
+  updatedAt: String!
+  url: String
+  user(where: UsersFilters): EventsUserRelation
+  userId: Int!
+}
+
+input EventsUpdateInput {
+  content: String
+  """Date"""
+  createdAt: String
+  eventType: EventsEventTypeEnum
+  id: Int
+  """Date"""
+  updatedAt: String
+  url: String
+  userId: Int
+}
+
+input EventsUpdatedAtFilters {
+  OR: [EventsUpdatedAtfiltersOr!]
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsUpdatedAtfiltersOr {
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsUrlFilters {
+  OR: [EventsUrlfiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsUrlfiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input EventsUserIdFilters {
+  OR: [EventsUserIdfiltersOr!]
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+input EventsUserIdfiltersOr {
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+type EventsUserRelation {
+  """Date"""
+  createdAt: String!
+  email: String!
+  events(limit: Int, offset: Int, orderBy: EventsOrderBy, where: EventsFilters): [EventsUserRelationEventsRelation!]!
+  firstName: String!
+  id: Int!
+  image: String
+  lastName: String!
+  phoneNumber: String!
+  """Date"""
+  updatedAt: String!
+}
+
+type EventsUserRelationEventsRelation {
+  content: String!
+  """Date"""
+  createdAt: String!
+  eventType: EventsEventTypeEnum
+  id: Int!
+  """Date"""
+  updatedAt: String!
+  url: String
+  userId: Int!
+}
+
+input InnerOrder {
+  direction: OrderDirection!
+  """Priority of current field"""
+  priority: Int!
+}
+
+type Mutation {
+  deleteFromEvents(where: EventsFilters): [EventsItem!]!
+  deleteFromUsers(where: UsersFilters): [UsersItem!]!
+  insertIntoEvents(values: [EventsInsertInput!]!): [EventsItem!]!
+  insertIntoEventsSingle(values: EventsInsertInput!): EventsItem
+  insertIntoUsers(values: [UsersInsertInput!]!): [UsersItem!]!
+  insertIntoUsersSingle(values: UsersInsertInput!): UsersItem
+  updateEvents(set: EventsUpdateInput!, where: EventsFilters): [EventsItem!]!
+  updateUsers(set: UsersUpdateInput!, where: UsersFilters): [UsersItem!]!
+}
+
+"""Order by direction"""
+enum OrderDirection {
+  """Ascending order"""
+  asc
+  """Descending order"""
+  desc
+}
+
+type Query {
+  events(limit: Int, offset: Int, orderBy: EventsOrderBy, where: EventsFilters): [EventsSelectItem!]!
+  eventsSingle(offset: Int, orderBy: EventsOrderBy, where: EventsFilters): EventsSelectItem
+  users(limit: Int, offset: Int, orderBy: UsersOrderBy, where: UsersFilters): [UsersSelectItem!]!
+  usersSingle(offset: Int, orderBy: UsersOrderBy, where: UsersFilters): UsersSelectItem
+}
+
+input UsersCreatedAtFilters {
+  OR: [UsersCreatedAtfiltersOr!]
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersCreatedAtfiltersOr {
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersEmailFilters {
+  OR: [UsersEmailfiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersEmailfiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+type UsersEventsRelation {
+  content: String!
+  """Date"""
+  createdAt: String!
+  eventType: EventsEventTypeEnum
+  id: Int!
+  """Date"""
+  updatedAt: String!
+  url: String
+  user(where: UsersFilters): UsersEventsRelationUserRelation
+  userId: Int!
+}
+
+type UsersEventsRelationUserRelation {
+  """Date"""
+  createdAt: String!
+  email: String!
+  firstName: String!
+  id: Int!
+  image: String
+  lastName: String!
+  phoneNumber: String!
+  """Date"""
+  updatedAt: String!
+}
+
+input UsersFilters {
+  OR: [UsersFiltersOr!]
+  createdAt: UsersCreatedAtFilters
+  email: UsersEmailFilters
+  firstName: UsersFirstNameFilters
+  id: UsersIdFilters
+  image: UsersImageFilters
+  lastName: UsersLastNameFilters
+  phoneNumber: UsersPhoneNumberFilters
+  updatedAt: UsersUpdatedAtFilters
+}
+
+input UsersFiltersOr {
+  createdAt: UsersCreatedAtFilters
+  email: UsersEmailFilters
+  firstName: UsersFirstNameFilters
+  id: UsersIdFilters
+  image: UsersImageFilters
+  lastName: UsersLastNameFilters
+  phoneNumber: UsersPhoneNumberFilters
+  updatedAt: UsersUpdatedAtFilters
+}
+
+input UsersFirstNameFilters {
+  OR: [UsersFirstNamefiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersFirstNamefiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersIdFilters {
+  OR: [UsersIdfiltersOr!]
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+input UsersIdfiltersOr {
+  eq: Int
+  gt: Int
+  gte: Int
+  ilike: String
+  """Array<undefined>"""
+  inArray: [Int!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: Int
+  lte: Int
+  ne: Int
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [Int!]
+  notLike: String
+}
+
+input UsersImageFilters {
+  OR: [UsersImagefiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersImagefiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersInsertInput {
+  """Date"""
+  createdAt: String
+  email: String!
+  firstName: String!
+  id: Int
+  image: String
+  lastName: String!
+  phoneNumber: String!
+  """Date"""
+  updatedAt: String
+}
+
+type UsersItem {
+  """Date"""
+  createdAt: String!
+  email: String!
+  firstName: String!
+  id: Int!
+  image: String
+  lastName: String!
+  phoneNumber: String!
+  """Date"""
+  updatedAt: String!
+}
+
+input UsersLastNameFilters {
+  OR: [UsersLastNamefiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersLastNamefiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersOrderBy {
+  createdAt: InnerOrder
+  email: InnerOrder
+  firstName: InnerOrder
+  id: InnerOrder
+  image: InnerOrder
+  lastName: InnerOrder
+  phoneNumber: InnerOrder
+  updatedAt: InnerOrder
+}
+
+input UsersPhoneNumberFilters {
+  OR: [UsersPhoneNumberfiltersOr!]
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersPhoneNumberfiltersOr {
+  eq: String
+  gt: String
+  gte: String
+  ilike: String
+  """Array<undefined>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  lt: String
+  lte: String
+  ne: String
+  notIlike: String
+  """Array<undefined>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+type UsersSelectItem {
+  """Date"""
+  createdAt: String!
+  email: String!
+  events(limit: Int, offset: Int, orderBy: EventsOrderBy, where: EventsFilters): [UsersEventsRelation!]!
+  firstName: String!
+  id: Int!
+  image: String
+  lastName: String!
+  phoneNumber: String!
+  """Date"""
+  updatedAt: String!
+}
+
+input UsersUpdateInput {
+  """Date"""
+  createdAt: String
+  email: String
+  firstName: String
+  id: Int
+  image: String
+  lastName: String
+  phoneNumber: String
+  """Date"""
+  updatedAt: String
+}
+
+input UsersUpdatedAtFilters {
+  OR: [UsersUpdatedAtfiltersOr!]
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}
+
+input UsersUpdatedAtfiltersOr {
+  """Date"""
+  eq: String
+  """Date"""
+  gt: String
+  """Date"""
+  gte: String
+  ilike: String
+  """Array<Date>"""
+  inArray: [String!]
+  isNotNull: Boolean
+  isNull: Boolean
+  like: String
+  """Date"""
+  lt: String
+  """Date"""
+  lte: String
+  """Date"""
+  ne: String
+  notIlike: String
+  """Array<Date>"""
+  notInArray: [String!]
+  notLike: String
+}

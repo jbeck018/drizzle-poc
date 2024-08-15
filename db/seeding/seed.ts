@@ -17,6 +17,7 @@ const seed = async () => {
             firstName,
             lastName,
             phoneNumber: faker.phone.number(),
+            image: faker.image.avatar(),
         };
     });
 

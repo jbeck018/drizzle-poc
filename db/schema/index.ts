@@ -1,4 +1,4 @@
-import { integer, index, timestamp, numeric, serial, text, pgTable, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
+import { integer, index, timestamp, serial, text, pgTable, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ export const users = pgTable('users', {
   firstName: text('firstName').notNull(),
   lastName: text('lastName').notNull(),
   phoneNumber: text('phoneNumber').notNull(),
+  image: text('image'),
 }, (table) => {
     return {
       firstNameIdx: index("first_name_idx").on(table.firstName),

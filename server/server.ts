@@ -6,15 +6,15 @@ const { schema } = buildSchema(db);
 
 const yoga = createYoga({ 
     schema,
-    cors: request => {
-        const requestOrigin = request.headers.get('origin')
-        return {
-          origin: requestOrigin as string,
-          credentials: true,
-          allowedHeaders: ['X-Custom-Header'],
-          methods: ['POST']
-        }
-      },
+    // cors: request => {
+    //     const requestOrigin = request.headers.get('origin')
+    //     return {
+    //       origin: requestOrigin as string,
+    //       credentials: true,
+    //       allowedHeaders: ['X-Custom-Header'],
+    //       methods: ['POST']
+    //     }
+    //   },
     batching: {
         limit: 5,
     },
