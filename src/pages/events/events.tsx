@@ -13,13 +13,8 @@ export const Events = () => {
     const [query, setQuery] = useState('');
     const variables: EventsFilters = useMemo(() => ({
         OR: [
-            { eventType: { ilike: `%${query}%` } },
-            { content: { ilike: `%${query}%` } },
-            { user: { OR: [
-                { firstName: { ilike: `%${query}%`} },
-                { lastName: { ilike: `%${query}%`} },
-                { email: { ilike: `%${query}%`} },
-            ]}}
+            // { eventType: { ilike: `%${query}%` } },
+            { content: { ilike: `%${query}%` } }
         ]
     }), [query]);
 
@@ -29,7 +24,7 @@ export const Events = () => {
 
     const { data, isLoading, isFetching } = useQuery({
         queryKey: ["events", variables],
-        queryFn: () => executeGraphql(ListEvents, { where: variables }),
+        queryFn: () => executeGraphql(ListEvents, { where: variables, limit: 100 }),
     });
 
     const events = useMemo(() => data?.events || [], [data?.events]);
@@ -48,7 +43,7 @@ export const Events = () => {
                 {events.length > 0 && (
                     <ListContainer style={{ overflow: 'scroll', height: '100%' }}>
                         {events.map(event => (
-                            <Card variant='elevated' key={event.id}>
+                            <Card variant='outline' key={event.id}>
                                 <CardHeader>{`${startCase(event?.eventType as string)}`}</CardHeader>
                                 <CardBody>{`${event.url} | ${event.content}`}</CardBody>
                             </Card>

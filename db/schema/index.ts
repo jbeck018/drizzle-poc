@@ -1,5 +1,5 @@
 import { integer, index, timestamp, serial, text, pgTable, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -20,8 +20,9 @@ export const users = pgTable('users', {
     };
   });
 
-const userSchema = createSelectSchema(users);
-export type User = z.infer<typeof userSchema>;
+export const userSchema = createSelectSchema(users);
+export type User = InferSelectModel<typeof users>;
+export type CreateUser = InferInsertModel<typeof users>;
 
 export const usersRelations = relations(users, ({ many }) => ({
   events: many(events),
@@ -45,8 +46,9 @@ export const events = pgTable('events', {
     };
   });
 
-const eventsSchema = createSelectSchema(events);
-export type Event = z.infer<typeof eventsSchema>;
+export const eventsSchema = createSelectSchema(events);
+export type Event = InferSelectModel<typeof events>;
+export type CreateEvent = InferInsertModel<typeof events>;
 
 export const eventsRelation = relations(events, ({ one }) => ({
   user: one(users, { fields: [events.userId], references: [users.id] }),
