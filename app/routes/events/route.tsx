@@ -2,7 +2,6 @@ import { Card, CardHeader, CardBody } from '@chakra-ui/react'
 import { startCase } from 'lodash-es'
 import { useState, useEffect, Suspense } from 'react';
 import { ErrorComponent, ListContainer, ListContainerWithSearch, CardSkeletonList } from '../../components';
-import { debounce } from 'lodash-es';
 // import { ilike } from 'drizzle-orm';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
@@ -35,12 +34,10 @@ export const Events = () => {
     const [searchTerm, setSearchTerm] = useState(searchParams.get('query'));
 
     useEffect(() => {
-        debounce(() => {
-            setSearchParams(prev => {
-                prev.set("query", searchTerm || '');
-                return prev;
-            });
-        }, 400);
+        setSearchParams(prev => {
+            prev.set("query", searchTerm || '');
+            return prev;
+        });
     }, [searchTerm])
 
     const events = useLoaderData<typeof loader>();

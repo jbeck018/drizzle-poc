@@ -2,7 +2,6 @@ import { Card, CardHeader, Text, Avatar, Box, Flex, Heading } from '@chakra-ui/r
 import { Suspense, useEffect, useState } from 'react'
 import { ErrorComponent, ListContainer, ListContainerWithSearch, CardSkeletonList } from '../../components';
 import { Await, useSearchParams } from "@remix-run/react";
-import { debounce } from 'lodash-es';
 import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
 import { json } from "@remix-run/node"; // or cloudflare/deno
 import { useLoaderData } from "@remix-run/react";
@@ -36,12 +35,10 @@ export const Users = () => {
     const [searchTerm, setSearchTerm] = useState(searchParams.get('query'));
 
     useEffect(() => {
-        debounce(() => {
-            setSearchParams(prev => {
-                prev.set("query", searchTerm || '');
-                return prev;
-            });
-        }, 400);
+        setSearchParams(prev => {
+            prev.set("query", searchTerm || '');
+            return prev;
+        });
     }, [searchTerm])
 
     const users = useLoaderData<typeof loader>();
