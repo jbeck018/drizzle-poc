@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "types": ["@remix-run/node", "vite/client"],
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -18,8 +19,16 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* REmix stuff */
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
+    }
   },
-  "include": ["src", "db", "temporal", "graphql"],
-  "exclude": ["db/drizzle", "graphql/generated"]
+  "include": ["remix.env.d.ts", "app", "db", "temporal", "graphql"],
+  "exclude": ["db/drizzle"]
 }

@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { db } from '../index'
+import { db } from '../db.server'
 import { chunk, uniqBy } from "lodash";
 import { users, events, eventTypeEnumValues } from "../schema";
 
