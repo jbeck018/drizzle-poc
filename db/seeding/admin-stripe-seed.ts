@@ -1,5 +1,5 @@
-import { Interval, PRICING_PLANS } from "#app/modules/stripe/plans";
-import { stripe } from "#app/modules/stripe/stripe.server";
+import { Interval, PRICING_PLANS } from "../../app/modules/stripe/plans";
+import { stripe } from "../../app/modules/stripe/stripe.server";
 import { db } from "../db.server";
 import {
 	permissions,
@@ -11,69 +11,77 @@ import {
 import { rolesToPermissions, usersToRoles } from "./../schema/index";
 
 export async function seedUserAndStripe() {
+	let allPermissions = await db.query.permissions.findMany();
+
 	/**
 	 * Users, Roles, and Permissions.
 	 */
-	const entities = ["user"];
-	const actions = ["create", "read", "update", "delete"];
-	const accesses = ["own", "any"] as const;
+	if (allPermissions.length === 0) {
+		const entities = ["user"];
+		const actions = ["create", "read", "update", "delete"];
+		const accesses = ["own", "any"] as const;
 
-	for (const entity of entities) {
-		for (const action of actions) {
-			for (const access of accesses) {
-				await db.insert(permissions).values({ entity, action, access });
+		for (const entity of entities) {
+			for (const action of actions) {
+				for (const access of accesses) {
+					await db.insert(permissions).values({ entity, action, access });
+				}
 			}
 		}
+
+		allPermissions = await db.query.permissions.findMany();
+
+		const adminPermissions = allPermissions
+			.filter((p) => p.access === "any")
+			.map((p) => p.id);
+
+		const userPermissions = allPermissions
+			.filter((p) => p.access === "own")
+			.map((p) => p.id);
+
+		const adminRole = await db
+			.insert(roles)
+			.values({ name: "admin" })
+			.returning();
+
+		await Promise.all(
+			adminPermissions.map(
+				async (id: string) =>
+					await db.insert(rolesToPermissions).values({
+						role_id: adminRole[0]?.id,
+						permission_id: id,
+					}),
+			),
+		);
+
+		const userRole = await db
+			.insert(roles)
+			.values({ name: "user" })
+			.returning();
+
+		await Promise.all(
+			userPermissions.map(
+				async (id: string) =>
+					await db.insert(rolesToPermissions).values({
+						role_id: userRole[0]?.id,
+						permission_id: id,
+					}),
+			),
+		);
+
+		const user = await db
+			.insert(users)
+			.values({
+				email: "admin@admin.com",
+				username: "admin",
+			})
+			.returning();
+
+		await db.insert(usersToRoles).values([
+			{ user_id: user?.[0].id, role_id: adminRole?.[0].id },
+			{ user_id: user?.[0].id, role_id: userRole?.[0].id },
+		]);
 	}
-
-	const allPermissions = await db.query.permissions.findMany();
-
-	const adminPermissions = allPermissions
-		.filter((p) => p.access === "any")
-		.map((p) => p.id);
-	const userPermissions = allPermissions
-		.filter((p) => p.access === "own")
-		.map((p) => p.id);
-
-	const adminRole = await db
-		.insert(roles)
-		.values({ name: "admin" })
-		.returning();
-
-	await Promise.all(
-		adminPermissions.map(
-			async (id: string) =>
-				await db.insert(rolesToPermissions).values({
-					role_id: adminRole[0]?.id,
-					permission_id: id,
-				}),
-		),
-	);
-
-	const userRole = await db.insert(roles).values({ name: "user" }).returning();
-
-	await Promise.all(
-		userPermissions.map(
-			async (id: string) =>
-				await db.insert(rolesToPermissions).values({
-					role_id: userRole[0]?.id,
-					permission_id: id,
-				}),
-		),
-	);
-
-	const user = await db
-		.insert(users)
-		.values({
-			email: "admin@admin.com",
-			username: "admin",
-		})
-		.returning();
-
-	await db.insert(usersToRoles).values([
-		{ user_id: user?.[0].id, role_id: adminRole?.[0].id },
-		{ user_id: user?.[0].id, role_id: userRole?.[0].id },
-	]);
 
 	console.info(`🎭 User roles and permissions have been successfully created.`);
 
