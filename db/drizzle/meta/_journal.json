@@ -29,6 +29,20 @@
       "when": 1723763289872,
       "tag": "0003_new_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1724161448653,
+      "tag": "0004_glorious_radioactive_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1724163392335,
+      "tag": "0005_bouncy_polaris",
+      "breakpoints": true
     }
   ]
 }
