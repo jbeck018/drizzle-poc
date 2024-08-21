@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { db } from '../index'
-import { chunk, sample, sampleSize, uniqBy } from "lodash";
-import { users, events, eventTypeEnumValues, records, recordType, properties, recordTypeEnum, recordTypeEnumValues, propertyTypeEnumValues } from "../schema";
+import { chunk, sampleSize, uniqBy } from "lodash";
+import { users, events, eventTypeEnumValues, records, properties, recordTypeEnumValues, propertyTypeEnumValues } from "../schema";
 
 function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);

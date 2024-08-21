@@ -6,7 +6,7 @@ export default defineConfig({
   out: "./db/drizzle",
   dbCredentials: {
     host: process.env.HOST || "127.0.0.1",
-    port: process.env.PORT as unknown as number || 5432,
+    port: process.env.DB_PORT as unknown as number || 5432,
     user: process.env.DB_USER || "postgres",
     password: process.env.PASSWORD || "postgres",
     database: process.env.DB || "graphql",
