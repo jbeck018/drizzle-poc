@@ -1,62 +1,62 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1723736182559,
-      "tag": "0000_powerful_overlord",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1723736881853,
-      "tag": "0001_freezing_klaw",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1723738790145,
-      "tag": "0002_lying_turbo",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1723763289872,
-      "tag": "0003_new_radioactive_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1724255002832,
-      "tag": "0004_busy_spot",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1724255094048,
-      "tag": "0005_rare_richard_fisk",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1724257610925,
-      "tag": "0006_silly_pyro",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1724260093033,
-      "tag": "0007_clean_mimic",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1723736182559,
+			"tag": "0000_powerful_overlord",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1723736881853,
+			"tag": "0001_freezing_klaw",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1723738790145,
+			"tag": "0002_lying_turbo",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1723763289872,
+			"tag": "0003_new_radioactive_man",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1724255002832,
+			"tag": "0004_busy_spot",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1724255094048,
+			"tag": "0005_rare_richard_fisk",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1724257610925,
+			"tag": "0006_silly_pyro",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1724260093033,
+			"tag": "0007_clean_mimic",
+			"breakpoints": true
+		}
+	]
 }
