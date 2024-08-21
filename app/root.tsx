@@ -37,7 +37,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     ? await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id,sessionUser?.id),
         with: {
-          image: true,
           roles: {
             with: {
               role: true,

@@ -1,28 +1,28 @@
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import type {
-  MetaFunction,
-  LoaderFunctionArgs,
   ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
 } from '@remix-run/node'
-import { useRef, useEffect } from 'react'
-import { Form, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/node'
-import { useHydrated } from 'remix-utils/use-hydrated'
+import { Form, useLoaderData } from '@remix-run/react'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import { useHydrated } from 'remix-utils/use-hydrated'
 import { z } from 'zod'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { Loader2 } from 'lucide-react'
+import { Button } from '#app/components/ui/button'
+import { Input } from '#app/components/ui/input'
+import { commitSession, getSession } from '#app/modules/auth/auth-session.server'
 import { authenticator } from '#app/modules/auth/auth.server'
-import { getSession, commitSession } from '#app/modules/auth/auth-session.server'
+import { ROUTE_PATH as AUTH_VERIFY_PATH } from '#app/routes/auth+/verify'
+import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
+import { siteConfig } from '#app/utils/constants/brand'
 import { validateCSRF } from '#app/utils/csrf.server'
 import { checkHoneypot } from '#app/utils/honeypot.server'
 import { useIsPending } from '#app/utils/misc'
-import { siteConfig } from '#app/utils/constants/brand'
-import { Input } from '#app/components/ui/input'
-import { Button } from '#app/components/ui/button'
-import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
-import { ROUTE_PATH as AUTH_VERIFY_PATH } from '#app/routes/auth+/verify'
 
 export const ROUTE_PATH = '/auth/login' as const
 
@@ -86,7 +86,7 @@ export default function Login() {
     <div className="mx-auto flex h-full w-full max-w-96 flex-col items-center justify-center gap-6">
       <div className="mb-2 flex flex-col gap-2">
         <h3 className="text-center text-2xl font-medium text-primary">
-          Continue to Remix SaaS
+          Login to Funnel Intelligence
         </h3>
         <p className="text-center text-base font-normal text-primary/60">
           Welcome back! Please log in to continue.

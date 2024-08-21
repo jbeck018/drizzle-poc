@@ -1,8 +1,8 @@
-import { Image } from '@chakra-ui/react'
+import { Img } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { Link, Outlet } from '@remix-run/react'
-import Logo from '#app/assets/logo.png'
+import Logo from '#app/assets/logo_transparent.png'
 import { authenticator } from '#app/modules/auth/auth.server'
 import { ROUTE_PATH as HOME_PATH } from '#app/routes/_home+/_index'
 import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
@@ -54,7 +54,7 @@ export default function Layout() {
           prefetch="intent"
           className="z-10 flex h-10 flex-col items-center justify-center gap-2"
         >
-          <Image src={Logo} />
+          <Img src={Logo} />
         </Link>
       </div>
       <div className="relative hidden h-full w-[50%] flex-col justify-between overflow-hidden bg-card p-10 lg:flex">
@@ -62,7 +62,7 @@ export default function Layout() {
           to={HOME_PATH}
           prefetch="intent"
           className="z-10 flex h-10 w-10 items-center gap-1">
-          <Image src={Logo} />
+          <Img src={Logo} />
         </Link>
 
         <div className="z-10 flex flex-col items-start gap-2">

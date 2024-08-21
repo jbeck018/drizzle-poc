@@ -17,12 +17,11 @@ export const loader = async ({
     const data = await db.query.users.findMany({
         where: or(ilike(users.first_name, `%${term}%`), ilike(users.last_name, `%${term}%`), ilike(users.email, `%${term}%`)),
         with: {
-            image: true,
-                      roles: {
-            with: {
-              role: true,
-            }
-          },
+            roles: {
+                with: {
+                role: true,
+                }
+            },
           },
         limit: 100,
     })
