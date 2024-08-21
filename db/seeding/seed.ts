@@ -8,6 +8,7 @@ import {
 	records,
 	// users,
 } from "../schema";
+import { seedUserAndStripe } from "./admin-stripe-seed";
 
 function getRandomInt(max: number) {
 	return Math.floor(Math.random() * max);
@@ -205,3 +206,7 @@ const seed = async () => {
 
 // seed();
 // seedAccounts();
+seedUserAndStripe().catch((err: unknown) => {
+	console.error(err);
+	process.exit(1);
+});

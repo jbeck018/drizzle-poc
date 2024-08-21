@@ -12,7 +12,6 @@ import { sendAuthEmail } from "../email/templates/auth-email";
 import { authSessionStorage } from "./auth-session.server";
 
 export const authenticator = new Authenticator<User>(authSessionStorage);
-
 /**
  * TOTP - Strategy.
  */
@@ -38,10 +37,6 @@ authenticator.use(
 		async ({ email }) => {
 			let user = await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.email, email),
-				with: {
-					image: true,
-					roles: true,
-				},
 			});
 
 			if (!user) {
@@ -73,10 +68,6 @@ authenticator.use(
 			const email = profile._json.email || profile.emails[0].value;
 			let user = await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.email, email),
-				with: {
-					image: true,
-					roles: true,
-				},
 			});
 
 			if (!user) {
@@ -118,10 +109,6 @@ export async function requireUser(
 	const user = sessionUser?.id
 		? await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.id, sessionUser?.id),
-				with: {
-					image: true,
-					roles: true,
-				},
 			})
 		: null;
 	if (!user) {

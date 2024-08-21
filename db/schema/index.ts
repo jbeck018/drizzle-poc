@@ -7,6 +7,7 @@ import {
 	numeric,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
@@ -31,9 +32,9 @@ export const users = pgTable(
 		email: varchar("email", { length: 255 }).notNull(),
 		username: varchar("username", { length: 255 }),
 		customer_id: varchar("customer_id", { length: 255 }),
-		first_name: text("first_name").notNull(),
-		last_name: text("last_name").notNull(),
-		phone_number: text("phone_number").notNull(),
+		first_name: text("first_name"),
+		last_name: text("last_name"),
+		phone_number: text("phone_number"),
 		created_at: timestamp("created_at").notNull().defaultNow(),
 		updated_at: timestamp("updated_at").notNull().defaultNow(),
 	},
@@ -49,7 +50,8 @@ export const users = pgTable(
 export const usersRelations = relations(users, ({ one, many }) => ({
 	image: one(user_images),
 	subscription: one(subscriptions),
-	roles: many(roles),
+	usersToRoles: many(usersToRoles),
+	roles: many(usersToRoles),
 }));
 
 export const userSchema = createSelectSchema(users);
@@ -92,14 +94,43 @@ export const roles = pgTable(
 	}),
 );
 
-export const rolesRelations = relations(roles, ({ one, many }) => ({
-	users: many(users),
-	permissions: one(permissions),
+export const rolesRelations = relations(roles, ({ many }) => ({
+	users: many(usersToRoles),
+	usersToRoles: many(usersToRoles),
+	rolesToPermissions: many(rolesToPermissions),
+	permissions: many(rolesToPermissions),
 }));
 
 export const roleSchema = createSelectSchema(roles);
 export type Role = InferSelectModel<typeof roles>;
 export type CreateRole = InferInsertModel<typeof roles>;
+
+//ROLES <> USERS MANY TO MANY TABLES:
+export const usersToRoles = pgTable(
+	"users_to_roles",
+	{
+		role_id: uuid("role_id")
+			.notNull()
+			.references(() => roles.id),
+		user_id: uuid("user_id")
+			.notNull()
+			.references(() => users.id),
+	},
+	(t) => ({
+		pk: primaryKey({ columns: [t.role_id, t.user_id] }),
+	}),
+);
+
+export const usersToRolesRelations = relations(usersToRoles, ({ one }) => ({
+	permission: one(users, {
+		fields: [usersToRoles.user_id],
+		references: [users.id],
+	}),
+	role: one(roles, {
+		fields: [usersToRoles.role_id],
+		references: [roles.id],
+	}),
+}));
 
 // Permission Table
 export const permissions = pgTable(
@@ -123,12 +154,43 @@ export const permissions = pgTable(
 );
 
 export const permissionsRelations = relations(permissions, ({ many }) => ({
-	roles: many(roles),
+	rolesToPermissions: many(rolesToPermissions),
+	roles: many(rolesToPermissions),
 }));
 
 export const permissionSchema = createSelectSchema(permissions);
 export type Permission = InferSelectModel<typeof permissions>;
 export type CreatePermission = InferInsertModel<typeof permissions>;
+
+//ROLES <> PERMISSIONS MANY TO MANY TABLES:
+export const rolesToPermissions = pgTable(
+	"roles_to_permissions",
+	{
+		role_id: uuid("role_id")
+			.notNull()
+			.references(() => roles.id),
+		permission_id: uuid("permission_id")
+			.notNull()
+			.references(() => permissions.id),
+	},
+	(t) => ({
+		pk: primaryKey({ columns: [t.role_id, t.permission_id] }),
+	}),
+);
+
+export const rolesToPermissionsRelations = relations(
+	rolesToPermissions,
+	({ one }) => ({
+		permission: one(permissions, {
+			fields: [rolesToPermissions.permission_id],
+			references: [permissions.id],
+		}),
+		role: one(roles, {
+			fields: [rolesToPermissions.role_id],
+			references: [roles.id],
+		}),
+	}),
+);
 
 // Plan Table
 export const plans = pgTable("plans", {
@@ -166,7 +228,10 @@ export const prices = pgTable(
 );
 
 export const pricesRelations = relations(prices, ({ one, many }) => ({
-	plan: one(plans),
+	plan: one(plans, {
+		fields: [prices.plan_id],
+		references: [plans.id],
+	}),
 	subscriptions: many(subscriptions),
 }));
 
@@ -202,8 +267,14 @@ export const subscriptions = pgTable(
 );
 
 export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
-	plan: one(plans),
-	price: one(prices),
+	plan: one(plans, {
+		fields: [subscriptions.plan_id],
+		references: [plans.id],
+	}),
+	price: one(prices, {
+		fields: [subscriptions.price_id],
+		references: [prices.id],
+	}),
 }));
 
 export const subscriptionSchema = createSelectSchema(subscriptions);
