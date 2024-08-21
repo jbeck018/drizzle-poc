@@ -34,7 +34,6 @@ export const users = pgTable(
 		first_name: text("first_name").notNull(),
 		last_name: text("last_name").notNull(),
 		phone_number: text("phone_number").notNull(),
-		image: text("image"),
 		created_at: timestamp("created_at").notNull().defaultNow(),
 		updated_at: timestamp("updated_at").notNull().defaultNow(),
 	},
@@ -46,6 +45,12 @@ export const users = pgTable(
 		last_name_idx: index("last_name_idx").on(table.last_name),
 	}),
 );
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+	image: one(user_images),
+	subscription: one(subscriptions),
+	roles: many(roles),
+}));
 
 export const userSchema = createSelectSchema(users);
 export type User = InferSelectModel<typeof users>;
@@ -87,6 +92,11 @@ export const roles = pgTable(
 	}),
 );
 
+export const rolesRelations = relations(roles, ({ one, many }) => ({
+	users: many(users),
+	permissions: one(permissions),
+}));
+
 export const roleSchema = createSelectSchema(roles);
 export type Role = InferSelectModel<typeof roles>;
 export type CreateRole = InferInsertModel<typeof roles>;
@@ -112,6 +122,10 @@ export const permissions = pgTable(
 	}),
 );
 
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+	roles: many(roles),
+}));
+
 export const permissionSchema = createSelectSchema(permissions);
 export type Permission = InferSelectModel<typeof permissions>;
 export type CreatePermission = InferInsertModel<typeof permissions>;
@@ -124,6 +138,11 @@ export const plans = pgTable("plans", {
 	created_at: timestamp("created_at").notNull().defaultNow(),
 	updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const plansRelations = relations(plans, ({ many }) => ({
+	subscriptions: many(subscriptions),
+	prices: many(prices),
+}));
 
 export const planSchema = createSelectSchema(plans);
 export type Plan = InferSelectModel<typeof plans>;
@@ -145,6 +164,11 @@ export const prices = pgTable(
 		plan_id_idx: index("plan_id_idx").on(table.plan_id),
 	}),
 );
+
+export const pricesRelations = relations(prices, ({ one, many }) => ({
+	plan: one(plans),
+	subscriptions: many(subscriptions),
+}));
 
 export const priceSchema = createSelectSchema(prices);
 export type Price = InferSelectModel<typeof prices>;
@@ -177,6 +201,11 @@ export const subscriptions = pgTable(
 	}),
 );
 
+export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
+	plan: one(plans),
+	price: one(prices),
+}));
+
 export const subscriptionSchema = createSelectSchema(subscriptions);
 export type Subscription = InferSelectModel<typeof subscriptions>;
 export type CreateSubscription = InferInsertModel<typeof subscriptions>;
@@ -206,6 +235,10 @@ export const records = pgTable(
 		record_type_idx: index("record_type_idx").on(table.record_type),
 	}),
 );
+
+export const recordsRelations = relations(records, ({ many }) => ({
+	properties: many(properties),
+}));
 
 export const recordsSchema = createSelectSchema(records);
 export type Record = InferSelectModel<typeof records>;
@@ -247,22 +280,13 @@ export const properties = pgTable(
 	}),
 );
 
-export const propertiesSchema = createSelectSchema(properties);
-export type Property = InferSelectModel<typeof properties>;
-export type CreateProperty = InferInsertModel<typeof properties>;
-
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-	user_images: many(user_images),
-}));
-
-export const recordsRelations = relations(records, ({ many }) => ({
-	properties: many(properties),
-}));
-
 export const propertiesRelations = relations(properties, ({ one }) => ({
 	record: one(records, {
 		fields: [properties.record_id],
 		references: [records.id],
 	}),
 }));
+
+export const propertiesSchema = createSelectSchema(properties);
+export type Property = InferSelectModel<typeof properties>;
+export type CreateProperty = InferInsertModel<typeof properties>;

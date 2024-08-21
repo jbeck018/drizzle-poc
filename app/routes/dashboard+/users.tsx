@@ -15,7 +15,11 @@ export const loader = async ({
     const url = new URL(request.url);
     const term = url.searchParams.get("query") || '';
     const data = await db.query.users.findMany({
-        where: or(ilike(users.firstName, `%${term}%`), ilike(users.lastName, `%${term}%`), ilike(users.email, `%${term}%`)),
+        where: or(ilike(users.first_name, `%${term}%`), ilike(users.last_name, `%${term}%`), ilike(users.email, `%${term}%`)),
+        with: {
+            image: true,
+            roles: true,
+          },
         limit: 100,
     })
     
@@ -59,10 +63,10 @@ export const Users = () => {
                                             <CardHeader>
                                                 <Flex gap='4'>
                                                 <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
-                                                    <Avatar name={`${user.firstName} ${user.lastName}`} src={user?.image || undefined} />
+                                                    <Avatar name={`${user.first_name} ${user.last_name}`} src={undefined} />
                                                     <Box>
-                                                        <Heading size='sm'>{`${user.firstName} ${user.lastName}`}</Heading>
-                                                        <Text>{`${user.email} | ${user.phoneNumber}`}</Text>
+                                                        <Heading size='sm'>{`${user.first_name} ${user.last_name}`}</Heading>
+                                                        <Text>{`${user.email} | ${user.phone_number}`}</Text>
                                                     </Box>
                                                 </Flex>
                                                 </Flex>

@@ -1,11 +1,12 @@
+import { Image } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from '@remix-run/node'
-import { Outlet } from '@remix-run/react'
 import { json, redirect } from '@remix-run/node'
+import { Outlet } from '@remix-run/react'
+import Logo from '#app/assets/logo.png'
 import { requireUser } from '#app/modules/auth/auth.server'
-import { getDomainPathname } from '#app/utils/misc.server'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
 import { ROUTE_PATH as ONBOARDING_USERNAME_PATH } from '#app/routes/onboarding+/username'
-import { Logo } from '#app/components/logo'
+import { getDomainPathname } from '#app/utils/misc.server'
 
 export const ROUTE_PATH = '/onboarding' as const
 
@@ -26,7 +27,7 @@ export default function Onboarding() {
   return (
     <div className="relative flex h-screen w-full bg-card">
       <div className="absolute left-1/2 top-8 mx-auto -translate-x-1/2 transform justify-center">
-        <Logo />
+        <Image src={Logo} />
       </div>
       <div className="z-10 h-screen w-screen">
         <Outlet />

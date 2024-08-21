@@ -1,28 +1,30 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node'
-import { useRef, useState } from 'react'
-import { Form, useFetcher, useLoaderData, useActionData } from '@remix-run/react'
-import { json, redirect } from '@remix-run/node'
-import { z } from 'zod'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
+import { Form, useActionData, useFetcher, useLoaderData } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { Upload } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { z } from 'zod'
+import { Button } from '#app/components/ui/button'
+import { Input } from '#app/components/ui/input'
+import { destroySession, getSession } from '#app/modules/auth/auth-session.server'
 import { requireUser } from '#app/modules/auth/auth.server'
-import { getSession, destroySession } from '#app/modules/auth/auth-session.server'
-import { prisma } from '#app/utils/db.server'
-import { createToastHeaders } from '#app/utils/toast.server'
-import { useDoubleCheck } from '#app/utils/hooks/use-double-check'
-import { getUserImgSrc } from '#app/utils/misc'
+import { ROUTE_PATH as HOME_PATH } from '#app/routes/_home+/_index'
+import { ROUTE_PATH as RESET_IMAGE_PATH } from '#app/routes/resources+/reset-image'
+import {
+  ImageSchema,
+  ROUTE_PATH as UPLOAD_IMAGE_PATH,
+  type action as uploadImageAction,
+} from '#app/routes/resources+/upload-image'
 import { ERRORS } from '#app/utils/constants/errors'
 import { INTENTS } from '#app/utils/constants/misc'
-import { ROUTE_PATH as HOME_PATH } from '#app/routes/_home+/_layout'
-import { Input } from '#app/components/ui/input'
-import { Button } from '#app/components/ui/button'
-import {
-  type action as uploadImageAction,
-  ROUTE_PATH as UPLOAD_IMAGE_PATH,
-  ImageSchema,
-} from '#app/routes/resources+/upload-image'
-import { ROUTE_PATH as RESET_IMAGE_PATH } from '#app/routes/resources+/reset-image'
+import { useDoubleCheck } from '#app/utils/hooks/use-double-check'
+import { getUserImgSrc } from '#app/utils/misc'
+import { createToastHeaders } from '#app/utils/toast.server'
+import { db } from '#db/db.server'
+import { users } from '#db/schema'
 
 export const UsernameSchema = z.object({
   username: z
@@ -53,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const { username } = submission.value
-    const isUsernameTaken = await prisma.user.findUnique({ where: { username } })
+    const isUsernameTaken = await db.query.users.findFirst({ where: (user, { eq }) => eq(user.username, username)});
 
     if (isUsernameTaken) {
       return json(
@@ -65,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
       )
     }
 
-    await prisma.user.update({ where: { id: user.id }, data: { username } })
+    await db.update(users).set({ username }).where(eq(users.id, user.id ))
     return json(submission.reply({ fieldErrors: {} }), {
       headers: await createToastHeaders({
         title: 'Success!',
@@ -75,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (intent === INTENTS.USER_DELETE_ACCOUNT) {
-    await prisma.user.delete({ where: { id: user.id } })
+    await db.delete(users).where(eq(users.id, user.id));
     return redirect(HOME_PATH, {
       headers: {
         'Set-Cookie': await destroySession(

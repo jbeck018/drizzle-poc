@@ -1,5 +1,8 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { db } from "#db/db.server";
+import { subscriptions as subSchema } from "#db/schema";
 import {
 	sendSubscriptionErrorEmail,
 	sendSubscriptionSuccessEmail,
@@ -52,25 +55,28 @@ export async function action({ request }: ActionFunctionArgs) {
 					.object({ customer: z.string(), subscription: z.string() })
 					.parse(session);
 
-				const user = await prisma.user.findUnique({ where: { customerId } });
+				const user = await db.query.users.findFirst({
+					where: (users, { eq }) => eq(users.customer_id, customerId),
+				});
 				if (!user) throw new Error(ERRORS.SOMETHING_WENT_WRONG);
 
 				const subscription =
 					await stripe.subscriptions.retrieve(subscriptionId);
-				await prisma.subscription.update({
-					where: { userId: user.id },
-					data: {
+
+				await db
+					.update(subSchema)
+					.set({
 						id: subscription.id,
-						userId: user.id,
-						planId: String(subscription.items.data[0].plan.product),
-						priceId: String(subscription.items.data[0].price.id),
+						user_id: user.id,
+						plan_id: String(subscription.items.data[0].plan.product),
+						price_id: String(subscription.items.data[0].price.id),
 						interval: String(subscription.items.data[0].plan.interval),
 						status: subscription.status,
-						currentPeriodStart: subscription.current_period_start,
-						currentPeriodEnd: subscription.current_period_end,
-						cancelAtPeriodEnd: subscription.cancel_at_period_end,
-					},
-				});
+						current_period_start: subscription.current_period_start,
+						current_period_end: subscription.current_period_end,
+						cancel_at_period_end: subscription.cancel_at_period_end,
+					})
+					.where(eq(subSchema.user_id, user.id));
 
 				await sendSubscriptionSuccessEmail({
 					email: user.email,
@@ -107,23 +113,25 @@ export async function action({ request }: ActionFunctionArgs) {
 					.object({ customer: z.string() })
 					.parse(subscription);
 
-				const user = await prisma.user.findUnique({ where: { customerId } });
+				const user = await db.query.users.findFirst({
+					where: (users, { eq }) => eq(users.customer_id, customerId),
+				});
 				if (!user) throw new Error(ERRORS.SOMETHING_WENT_WRONG);
 
-				await prisma.subscription.update({
-					where: { userId: user.id },
-					data: {
+				await db
+					.update(subSchema)
+					.set({
 						id: subscription.id,
-						userId: user.id,
-						planId: String(subscription.items.data[0].plan.product),
-						priceId: String(subscription.items.data[0].price.id),
+						user_id: user.id,
+						plan_id: String(subscription.items.data[0].plan.product),
+						price_id: String(subscription.items.data[0].price.id),
 						interval: String(subscription.items.data[0].plan.interval),
 						status: subscription.status,
-						currentPeriodStart: subscription.current_period_start,
-						currentPeriodEnd: subscription.current_period_end,
-						cancelAtPeriodEnd: subscription.cancel_at_period_end,
-					},
-				});
+						current_period_start: subscription.current_period_start,
+						current_period_end: subscription.current_period_end,
+						cancel_at_period_end: subscription.cancel_at_period_end,
+					})
+					.where(eq(subSchema.user_id, user.id));
 
 				return new Response(null);
 			}
@@ -135,13 +143,13 @@ export async function action({ request }: ActionFunctionArgs) {
 				const subscription = event.data.object;
 				const { id } = z.object({ id: z.string() }).parse(subscription);
 
-				const dbSubscription = await prisma.subscription.findUnique({
-					where: { id },
+				const dbSubscription = await db.query.subscriptions.findFirst({
+					where: (subs, { eq }) => eq(subs.id, id),
 				});
-				if (dbSubscription)
-					await prisma.subscription.delete({
-						where: { id: dbSubscription.id },
-					});
+
+				if (dbSubscription) {
+					await db.delete(subSchema).where(eq(subSchema.id, dbSubscription.id));
+				}
 
 				return new Response(null);
 			}
@@ -155,7 +163,9 @@ export async function action({ request }: ActionFunctionArgs) {
 					.object({ customer: z.string(), subscription: z.string() })
 					.parse(session);
 
-				const user = await prisma.user.findUnique({ where: { customerId } });
+				const user = await db.query.users.findFirst({
+					where: (users, { eq }) => eq(users.customer_id, customerId),
+				});
 				if (!user) throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
 
 				await sendSubscriptionErrorEmail({ email: user.email, subscriptionId });
@@ -169,7 +179,9 @@ export async function action({ request }: ActionFunctionArgs) {
 					.object({ id: z.string(), customer: z.string() })
 					.parse(subscription);
 
-				const user = await prisma.user.findUnique({ where: { customerId } });
+				const user = await db.query.users.findFirst({
+					where: (users, { eq }) => eq(users.customer_id, customerId),
+				});
 				if (!user) throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
 
 				await sendSubscriptionErrorEmail({ email: user.email, subscriptionId });

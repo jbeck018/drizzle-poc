@@ -3,13 +3,11 @@
  * Add your brand details here.
  */
 export const siteConfig = {
-  siteTitle: 'Remix SaaS',
-  siteDescription:
-    'A Lightweight, Production-Ready Remix Stack for your next SaaS Application.',
-  siteUrl: 'https://remix-saas.fly.dev',
-  siteImage: '/images/og-image.png',
-  favicon: '/favicon.ico',
-  twitterHandle: '@remix_saas',
-  email: 'hello@remix-saas.run',
-  address: '',
-}
+	siteTitle: "Funnel Intelligence",
+	siteDescription: "Understand your Funnels.",
+	siteUrl: "https://remix-saas.fly.dev",
+	siteImage: "../../assets/logo.png",
+	favicon: "../../assets/favicon.png",
+	email: "jacobbeck.dev@gmail.com",
+	address: "",
+};

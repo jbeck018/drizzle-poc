@@ -1,14 +1,14 @@
-import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { ShoppingBasket, ExternalLink } from 'lucide-react'
-import { requireUserWithRole } from '#app/utils/permissions.server'
-import { prisma } from '#app/utils/db.server'
-import { cn } from '#app/utils/misc.js'
-import { siteConfig } from '#app/utils/constants/brand'
-import { buttonVariants } from '#app/components/ui/button'
-import { Navigation } from '#app/components/navigation'
+import { useLoaderData } from '@remix-run/react'
+import { ExternalLink, ShoppingBasket } from 'lucide-react'
+import { buttonVariants } from '#app/components'
 import { Header } from '#app/components/header'
+import { TopNavigation } from '#app/components/navigations'
+import { siteConfig } from '#app/utils/constants/brand'
+import { cn } from '#app/utils/misc'
+import { requireUserWithRole } from '#app/utils/permissions.server'
+import { db } from '#db/db.server'
 
 export const ROUTE_PATH = '/admin' as const
 
@@ -18,9 +18,9 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUserWithRole(request, 'admin')
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
-  })
+  const subscription = await db.query.subscriptions.findFirst({
+    where: (subscriptions, {eq}) => eq(subscriptions.user_id, user.id),
+  });
   return json({ user, subscription } as const)
 }
 
@@ -29,7 +29,7 @@ export default function Admin() {
 
   return (
     <div className="flex min-h-[100vh] w-full flex-col bg-secondary dark:bg-black">
-      <Navigation user={user} planId={subscription?.planId} />
+      <TopNavigation user={user as any} plan_id={subscription?.plan_id} />
       <Header />
 
       <div className="flex h-full w-full px-6 py-8">

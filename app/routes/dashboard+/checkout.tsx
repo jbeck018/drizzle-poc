@@ -1,15 +1,15 @@
-import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { useState } from 'react'
-import { Link, useLoaderData, useRevalidator } from '@remix-run/react'
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
-import { Loader2, BadgeCheck, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Link, useLoaderData, useRevalidator } from '@remix-run/react'
+import { AlertTriangle, BadgeCheck, ExternalLink, Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { buttonVariants } from '#app/components/ui/button'
 import { requireSessionUser } from '#app/modules/auth/auth.server'
 import { PLANS } from '#app/modules/stripe/plans'
-import { prisma } from '#app/utils/db.server'
-import { useInterval } from '#app/utils/hooks/use-interval'
-import { siteConfig } from '#app/utils/constants/brand'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
-import { buttonVariants } from '#app/components/ui/button'
+import { siteConfig } from '#app/utils/constants/brand'
+import { useInterval } from '#app/utils/hooks/use-interval'
+import { db } from '#db/db.server'
 
 export const ROUTE_PATH = '/dashboard/checkout'
 
@@ -19,12 +19,13 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const sessionUser = await requireSessionUser(request)
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: sessionUser.id },
-  })
+  const subscription = await db.query.subscriptions.findFirst({
+    where: (sub, { eq }) => eq(sub.user_id, sessionUser.id)
+  });
+
   if (!subscription) return redirect(DASHBOARD_PATH)
 
-  return json({ isFreePlan: subscription.planId === PLANS.FREE } as const)
+  return json({ isFreePlan: subscription.plan_id === PLANS.FREE } as const)
 }
 
 export default function DashboardCheckout() {

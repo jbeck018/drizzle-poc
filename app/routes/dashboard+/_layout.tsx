@@ -1,6 +1,6 @@
 import { FaUserAlt } from "react-icons/fa";
 import { FaBoltLightning } from "react-icons/fa6";
-import { Navigation } from '#app/components/navigation';
+import { Navigation } from '#app/components/navigations';
 
 export const ROUTE_PATH = '/dashboard' as const
 

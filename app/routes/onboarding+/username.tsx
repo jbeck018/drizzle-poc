@@ -1,32 +1,34 @@
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import type {
-  MetaFunction,
-  LoaderFunctionArgs,
   ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
 } from '@remix-run/node'
-import { useRef, useEffect } from 'react'
-import { Form, useActionData } from '@remix-run/react'
 import { json, redirect } from '@remix-run/node'
-import { useHydrated } from 'remix-utils/use-hydrated'
+import { Form, useActionData } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import { useHydrated } from 'remix-utils/use-hydrated'
 import { z } from 'zod'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { Loader2 } from 'lucide-react'
+import { Button } from '#app/components/ui/button'
+import { Input } from '#app/components/ui/input'
 import { requireSessionUser } from '#app/modules/auth/auth.server'
 import {
   createCustomer,
   createFreeSubscription,
 } from '#app/modules/stripe/queries.server'
-import { prisma } from '#app/utils/db.server'
+import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
+import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
+import { ERRORS } from '#app/utils/constants/errors'
 import { validateCSRF } from '#app/utils/csrf.server'
+import { db } from '#app/utils/db.server'
 import { checkHoneypot } from '#app/utils/honeypot.server'
 import { useIsPending } from '#app/utils/misc'
-import { ERRORS } from '#app/utils/constants/errors'
-import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
-import { Input } from '#app/components/ui/input'
-import { Button } from '#app/components/ui/button'
-import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
+import { users } from '#db/schema'
 
 export const ROUTE_PATH = '/onboarding/username' as const
 
@@ -65,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const { username } = submission.value
-  const isUsernameTaken = await prisma.user.findUnique({ where: { username } })
+  const isUsernameTaken = await db.query.users.findFirst({ where: (user, { eq }) => eq(user.username, username)});
 
   if (isUsernameTaken) {
     return json(
@@ -76,10 +78,10 @@ export async function action({ request }: ActionFunctionArgs) {
       }),
     )
   }
-  await prisma.user.update({ where: { id: sessionUser.id }, data: { username } })
+  await db.update(users).set({ username }).where(eq(users.id, sessionUser.id ))
   await createCustomer({ userId: sessionUser.id })
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: sessionUser.id },
+  const subscription = await db.query.subscriptions.findFirst({
+    where: (sub, {eq}) => eq(sub.user_id, sessionUser.id)
   })
   if (!subscription) await createFreeSubscription({ userId: sessionUser.id, request })
 

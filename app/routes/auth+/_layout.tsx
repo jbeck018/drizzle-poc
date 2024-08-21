@@ -1,12 +1,13 @@
+import { Image } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet } from '@remix-run/react'
 import { json, redirect } from '@remix-run/node'
+import { Link, Outlet } from '@remix-run/react'
+import Logo from '#app/assets/logo.png'
 import { authenticator } from '#app/modules/auth/auth.server'
-import { getDomainPathname } from '#app/utils/misc.server'
-import { ROUTE_PATH as HOME_PATH } from '#app/routes/_home+/_layout'
+import { ROUTE_PATH as HOME_PATH } from '#app/routes/_home+/_index'
 import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
-import { Logo } from '#app/components/logo'
+import { getDomainPathname } from '#app/utils/misc.server'
 
 export const ROUTE_PATH = '/auth' as const
 
@@ -51,8 +52,9 @@ export default function Layout() {
         <Link
           to={HOME_PATH}
           prefetch="intent"
-          className="z-10 flex h-10 flex-col items-center justify-center gap-2">
-          <Logo />
+          className="z-10 flex h-10 flex-col items-center justify-center gap-2"
+        >
+          <Image src={Logo} />
         </Link>
       </div>
       <div className="relative hidden h-full w-[50%] flex-col justify-between overflow-hidden bg-card p-10 lg:flex">
@@ -60,7 +62,7 @@ export default function Layout() {
           to={HOME_PATH}
           prefetch="intent"
           className="z-10 flex h-10 w-10 items-center gap-1">
-          <Logo />
+          <Image src={Logo} />
         </Link>
 
         <div className="z-10 flex flex-col items-start gap-2">

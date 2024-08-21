@@ -1,3 +1,13 @@
+/*
+* TailwindCSS & ShadCN.
+* @see https://tailwindcss.com/docs/guides/remix
+* @see https://ui.shadcn.com
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

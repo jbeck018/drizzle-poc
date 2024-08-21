@@ -1,24 +1,24 @@
 import type {
-  MetaFunction,
-  LoaderFunctionArgs,
   ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
 } from '@remix-run/node'
-import type { Interval, Plan } from '#app/modules/stripe/plans'
-import { useState } from 'react'
-import { Form, useLoaderData } from '@remix-run/react'
 import { json, redirect } from '@remix-run/node'
-import { requireSessionUser } from '#app/modules/auth/auth.server'
-import { PLANS, PRICING_PLANS, INTERVALS, CURRENCIES } from '#app/modules/stripe/plans'
-import {
-  createSubscriptionCheckout,
-  createCustomerPortal,
-} from '#app/modules/stripe/queries.server'
-import { prisma } from '#app/utils/db.server'
-import { getLocaleCurrency } from '#app/utils/misc.server'
-import { INTENTS } from '#app/utils/constants/misc'
-import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
-import { Switch } from '#app/components/ui/switch'
+import { Form, useLoaderData } from '@remix-run/react'
+import { useState } from 'react'
 import { Button } from '#app/components/ui/button'
+import { Switch } from '#app/components/ui/switch'
+import { requireSessionUser } from '#app/modules/auth/auth.server'
+import type { Interval, Plan } from '#app/modules/stripe/plans'
+import { CURRENCIES, INTERVALS, PLANS, PRICING_PLANS } from '#app/modules/stripe/plans'
+import {
+  createCustomerPortal,
+  createSubscriptionCheckout,
+} from '#app/modules/stripe/queries.server'
+import { ROUTE_PATH as LOGIN_PATH } from '#app/routes/auth+/login'
+import { INTENTS } from '#app/utils/constants/misc'
+import { getLocaleCurrency } from '#app/utils/misc.server'
+import { db } from '#db/db.server'
 
 export const ROUTE_PATH = '/dashboard/settings/billing' as const
 
@@ -31,9 +31,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     redirectTo: LOGIN_PATH,
   })
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: sessionUser.id },
+  const subscription = await db.query.subscriptions.findFirst({
+    where: (sub, {eq}) => eq(sub.user_id, sessionUser.id)
   })
+
   const currency = getLocaleCurrency(request)
 
   return json({ subscription, currency } as const)
@@ -48,11 +49,11 @@ export async function action({ request }: ActionFunctionArgs) {
   const intent = formData.get(INTENTS.INTENT)
 
   if (intent === INTENTS.SUBSCRIPTION_CREATE_CHECKOUT) {
-    const planId = String(formData.get('planId'))
+    const plan_id = String(formData.get('plan_id'))
     const planInterval = String(formData.get('planInterval'))
     const checkoutUrl = await createSubscriptionCheckout({
       userId: sessionUser.id,
-      planId,
+      plan_id,
       planInterval,
       request,
     })
@@ -73,8 +74,8 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function DashboardBilling() {
   const { subscription, currency } = useLoaderData<typeof loader>()
 
-  const [selectedPlanId, setSelectedPlanId] = useState<Plan>(
-    (subscription?.planId as Plan) ?? PLANS.FREE,
+  const [selectedplan_id, setSelectedplan_id] = useState<Plan>(
+    (subscription?.plan_id as Plan) ?? PLANS.FREE,
   )
   const [selectedPlanInterval, setSelectedPlanInterval] = useState<Interval>(
     INTERVALS.MONTH,
@@ -106,15 +107,15 @@ export default function DashboardBilling() {
             You are currently on the{' '}
             <span className="flex h-[18px] items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
               {subscription
-                ? subscription.planId?.charAt(0).toUpperCase() +
-                  subscription.planId.slice(1)
+                ? subscription.plan_id?.charAt(0).toUpperCase() +
+                  subscription.plan_id.slice(1)
                 : 'Free'}
             </span>
             plan.
           </p>
         </div>
 
-        {subscription?.planId === PLANS.FREE && (
+        {subscription?.plan_id === PLANS.FREE && (
           <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
             {Object.values(PRICING_PLANS).map((plan) => (
               <div
@@ -122,11 +123,11 @@ export default function DashboardBilling() {
                 tabIndex={0}
                 role="button"
                 className={`flex w-full select-none items-center rounded-md border border-border hover:border-primary/60 ${
-                  selectedPlanId === plan.id && 'border-primary/60'
+                  selectedplan_id === plan.id && 'border-primary/60'
                 }`}
-                onClick={() => setSelectedPlanId(plan.id)}
+                onClick={() => setSelectedplan_id(plan.id)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') setSelectedPlanId(plan.id)
+                  if (e.key === 'Enter') setSelectedplan_id(plan.id)
                 }}>
                 <div className="flex w-full flex-col items-start p-4">
                   <div className="flex items-center gap-2">
@@ -172,17 +173,17 @@ export default function DashboardBilling() {
           </div>
         )}
 
-        {subscription && subscription.planId !== PLANS.FREE && (
+        {subscription && subscription.plan_id !== PLANS.FREE && (
           <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
             <div className="flex w-full items-center overflow-hidden rounded-md border border-primary/60">
               <div className="flex w-full flex-col items-start p-4">
                 <div className="flex items-end gap-2">
                   <span className="text-base font-medium text-primary">
-                    {subscription.planId.charAt(0).toUpperCase() +
-                      subscription.planId.slice(1)}
+                    {subscription.plan_id.charAt(0).toUpperCase() +
+                      subscription.plan_id.slice(1)}
                   </span>
                   <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
-                    {subscription.cancelAtPeriodEnd === true ? (
+                    {subscription.cancel_at_period_end === true ? (
                       <span className="flex h-[18px] items-center text-sm font-medium text-red-500">
                         Expires
                       </span>
@@ -192,7 +193,7 @@ export default function DashboardBilling() {
                       </span>
                     )}
                     on:{' '}
-                    {new Date(subscription.currentPeriodEnd * 1000).toLocaleDateString(
+                    {new Date(subscription.current_period_end * 1000).toLocaleDateString(
                       'en-US',
                     )}
                     .
@@ -210,16 +211,16 @@ export default function DashboardBilling() {
           <p className="text-sm font-normal text-primary/60">
             You will not be charged for testing the subscription upgrade.
           </p>
-          {subscription?.planId === PLANS.FREE && (
+          {subscription?.plan_id === PLANS.FREE && (
             <Form method="POST">
-              <input type="hidden" name="planId" value={selectedPlanId} />
+              <input type="hidden" name="plan_id" value={selectedplan_id} />
               <input type="hidden" name="planInterval" value={selectedPlanInterval} />
               <Button
                 type="submit"
                 size="sm"
                 name={INTENTS.INTENT}
                 value={INTENTS.SUBSCRIPTION_CREATE_CHECKOUT}
-                disabled={selectedPlanId === PLANS.FREE}>
+                disabled={selectedplan_id === PLANS.FREE}>
                 Upgrade to PRO
               </Button>
             </Form>

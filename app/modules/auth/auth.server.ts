@@ -3,7 +3,7 @@ import { Authenticator } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
 import { TOTPStrategy } from "remix-auth-totp";
 import { db } from "#db/db.server";
-import { User, users } from "#db/schema";
+import { CreateUser, User, users } from "#db/schema";
 import { ROUTE_PATH as LOGOUT_PATH } from "../../routes/auth+/logout";
 import { ROUTE_PATH as MAGIC_LINK_PATH } from "../../routes/auth+/magic-link";
 import { ERRORS } from "../../utils/constants/errors";
@@ -38,15 +38,19 @@ authenticator.use(
 		async ({ email }) => {
 			let user = await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.email, email),
+				with: {
+					image: true,
+					roles: true,
+				},
 			});
 
 			if (!user) {
-				user = await db
+				user = (await db
 					.insert(users)
 					.values({
 						email,
-					})
-					.returning();
+					} as CreateUser)
+					.returning()) as any;
 				if (!user) throw new Error(ERRORS.AUTH_USER_NOT_CREATED);
 			}
 
@@ -69,23 +73,20 @@ authenticator.use(
 			const email = profile._json.email || profile.emails[0].value;
 			let user = await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.email, email),
+				with: {
+					image: true,
+					roles: true,
+				},
 			});
 
 			if (!user) {
-				user = await prisma.user.create({
-					data: {
+				user = (await db
+					.insert(users)
+					.values({
 						roles: { connect: [{ name: "user" }] },
 						email,
-					},
-					include: {
-						image: { select: { id: true } },
-						roles: {
-							select: {
-								name: true,
-							},
-						},
-					},
-				});
+					} as any)
+					.returning()) as any;
 				if (!user) throw new Error(ERRORS.AUTH_USER_NOT_CREATED);
 			}
 
@@ -117,6 +118,10 @@ export async function requireUser(
 	const user = sessionUser?.id
 		? await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.id, sessionUser?.id),
+				with: {
+					image: true,
+					roles: true,
+				},
 			})
 		: null;
 	if (!user) {
