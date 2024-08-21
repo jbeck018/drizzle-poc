@@ -1,0 +1,2 @@
+-- ALTER TABLE "admins" ALTER COLUMN "id" SET DATA TYPE serial;
+DROP TABLE IF EXISTS "admins"

@@ -1,27 +1,61 @@
-import { Navigation } from "./components";
 import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from '@chakra-ui/react'
-import { FaUserAlt } from "react-icons/fa";
-import { FaBoltLightning } from "react-icons/fa6";
-import { Links, Scripts } from "@remix-run/react";
-import indexStyles from './index.css?url';
-import { LinksFunction } from "@remix-run/node";
 import { withEmotionCache } from '@emotion/react';
-import { ServerStyleContext, ClientStyleContext } from './context';
+import { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { Links, Outlet, Scripts, json } from "@remix-run/react";
 import { useContext, useEffect } from "react";
+import { db } from "#db/db.server";
 import favicon from './assets/favicon.png';
 import logo from './assets/logo.png';
+import { ClientStyleContext, ServerStyleContext } from './context';
+import indexStyles from './index.css?url';
+import { authenticator } from "./modules/auth/auth.server";
+import { csrf } from "./utils/csrf.server";
+import { getHints } from "./utils/hooks/use-hints";
+import { combineHeaders, getDomainUrl } from "./utils/misc.server";
+import { getToastSession } from "./utils/toast.server";
 
 export const links: LinksFunction = () => {
-    // `links` returns an array of objects whose
-    // properties map to the `<link />` component props
-    return [
-        { rel: "icon", href: favicon },
-        { rel: "apple-touch-icon", href: logo },
-        // { rel: "manifest", href: "/manifest.json" },
-      { rel: "stylesheet", href: indexStyles },
-    ];
-  };
+  // `links` returns an array of objects whose
+  // properties map to the `<link />` component props
+  return [
+      { rel: "icon", href: favicon },
+      { rel: "apple-touch-icon", href: logo },
+      // { rel: "manifest", href: "/manifest.json" },
+    { rel: "stylesheet", href: indexStyles },
+  ];
+};
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const sessionUser = await authenticator.isAuthenticated(request)
+  const user = sessionUser?.id
+    ? await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id,sessionUser?.id),
+      })
+    : null
+
+  const { toast, headers: toastHeaders } = await getToastSession(request)
+  const [csrfToken, csrfCookieHeader] = await csrf.commitToken()
+
+  return json(
+    {
+      user,
+      toast,
+      csrfToken,
+      requestInfo: {
+        hints: getHints(request),
+        origin: getDomainUrl(request),
+        path: new URL(request.url).pathname,
+      },
+    } as const,
+    {
+      headers: combineHeaders(
+        toastHeaders,
+        csrfCookieHeader ? { 'Set-Cookie': csrfCookieHeader } : null,
+      ),
+    },
+  )
+}
 
 const colors = {
   brand: {
@@ -32,24 +66,6 @@ const colors = {
 }
 
 const theme = extendTheme({ colors })
-
-const ROUTES = {
-  users: "users/",
-  events: "events/",
-}
-
-const navItems = [
-  {
-    route: ROUTES.users,
-    icon: FaUserAlt,
-    name: 'Users',
-  },
-  {
-    route: ROUTES.events,
-    icon: FaBoltLightning,
-    name: 'Events',
-  },
-];
 
 
 
@@ -97,7 +113,7 @@ const Root = withEmotionCache((_, emotionCache) => {
       <body>
         <div id="root">
             <ChakraProvider theme={theme}>
-                <Navigation items={navItems} />
+                <Outlet />
             </ChakraProvider>
         </div>
         <Scripts />

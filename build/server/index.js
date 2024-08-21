@@ -9,14 +9,14 @@ import createEmotionServer from '@emotion/server/create-instance';
 import createCache from '@emotion/cache';
 import { Tooltip, Icon, Input, Skeleton, extendTheme, ChakraProvider, Card, CardHeader, CardBody, Flex, Avatar, Box, Heading, Text } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { startCase, debounce } from 'lodash-es';
+import { startCase } from 'lodash-es';
 import { FaUserAlt } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
 import { createContext, useContext, useEffect, useState, Suspense } from 'react';
-import { relations, ilike, or } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
 import { pgTable, serial, timestamp, text, index, uniqueIndex, pgEnum, integer } from 'drizzle-orm/pg-core';
+import { relations, or, ilike } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -384,9 +384,10 @@ const loader$1 = async ({
   request
 }) => {
   const url = new URL(request.url);
-  const term = url.searchParams.get("query");
+  const term = url.searchParams.get("query") || "";
   const data = await db.query.events.findMany({
-    where: ilike(events.content, `%${term}%`)
+    where: (events, { ilike }) => ilike(events.content, `%${term}%`),
+    limit: 100
   });
   if (!data) {
     throw json(
@@ -400,17 +401,15 @@ const Events = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("query"));
   useEffect(() => {
-    debounce(() => {
-      setSearchParams((prev) => {
-        prev.set("query", searchTerm || "");
-        return prev;
-      });
-    }, 400);
+    setSearchParams((prev) => {
+      prev.set("query", searchTerm || "");
+      return prev;
+    });
   }, [searchTerm]);
-  const events2 = useLoaderData();
-  return /* @__PURE__ */ jsx(ListContainerWithSearch, { searchTerm, onChange: setSearchTerm, children: /* @__PURE__ */ jsx(Suspense, { fallback: /* @__PURE__ */ jsx(CardSkeletonList, { count: 10 }), children: /* @__PURE__ */ jsx(Await, { resolve: events2, children: (events3) => /* @__PURE__ */ jsx(ListContainer, { children: /* @__PURE__ */ jsxs(ListContainer, { style: { overflow: "scroll", height: "100%" }, children: [
-    events3?.length === 0 && /* @__PURE__ */ jsx(ErrorComponent, { header: "No Events found...", text: "Try adjusting your query OR go get some events!" }),
-    events3?.length > 0 && /* @__PURE__ */ jsx(ListContainer, { style: { overflow: "scroll", height: "100%" }, children: events3.map((event) => /* @__PURE__ */ jsxs(Card, { variant: "outline", children: [
+  const events = useLoaderData();
+  return /* @__PURE__ */ jsx(ListContainerWithSearch, { searchTerm, onChange: setSearchTerm, children: /* @__PURE__ */ jsx(Suspense, { fallback: /* @__PURE__ */ jsx(CardSkeletonList, { count: 10 }), children: /* @__PURE__ */ jsx(Await, { resolve: events, children: (events2) => /* @__PURE__ */ jsx(ListContainer, { children: /* @__PURE__ */ jsxs(ListContainer, { style: { overflow: "scroll", height: "100%" }, children: [
+    events2?.length === 0 && /* @__PURE__ */ jsx(ErrorComponent, { header: "No Events found...", text: "Try adjusting your query OR go get some events!" }),
+    events2?.length > 0 && /* @__PURE__ */ jsx(ListContainer, { style: { overflow: "scroll", height: "100%" }, children: events2.map((event) => /* @__PURE__ */ jsxs(Card, { variant: "outline", children: [
       /* @__PURE__ */ jsx(CardHeader, { children: `${startCase(event?.eventType)}` }),
       /* @__PURE__ */ jsx(CardBody, { children: `${event.url} | ${event.content}` })
     ] }, event.id)) })
@@ -428,9 +427,10 @@ const loader = async ({
   request
 }) => {
   const url = new URL(request.url);
-  const term = url.searchParams.get("query");
+  const term = url.searchParams.get("query") || "";
   const data = await db.query.users.findMany({
-    where: or(ilike(users.firstName, `%${term}%`), ilike(users.lastName, `%${term}%`), ilike(users.email, `%${term}%`))
+    where: or(ilike(users.firstName, `%${term}%`), ilike(users.lastName, `%${term}%`), ilike(users.email, `%${term}%`)),
+    limit: 100
   });
   if (!data) {
     throw json(
@@ -444,12 +444,10 @@ const Users = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("query"));
   useEffect(() => {
-    debounce(() => {
-      setSearchParams((prev) => {
-        prev.set("query", searchTerm || "");
-        return prev;
-      });
-    }, 400);
+    setSearchParams((prev) => {
+      prev.set("query", searchTerm || "");
+      return prev;
+    });
   }, [searchTerm]);
   const users2 = useLoaderData();
   return /* @__PURE__ */ jsx(ListContainerWithSearch, { searchTerm, onChange: setSearchTerm, children: /* @__PURE__ */ jsx(Suspense, { fallback: /* @__PURE__ */ jsx(CardSkeletonList, { count: 10 }), children: /* @__PURE__ */ jsx(Await, { resolve: users2, children: (users3) => /* @__PURE__ */ jsxs(ListContainer, { children: [
@@ -471,7 +469,7 @@ const route3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   loader
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const serverManifest = {'entry':{'module':'/assets/entry.client-DU6FvMMA.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/context-DCszVdUq.js'],'css':[]},'routes':{'root':{'id':'root','parentId':undefined,'path':'','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':false,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/root-C81QIA9U.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/context-DCszVdUq.js','/assets/error-components-Cog0L8rg.js'],'css':[]},'routes/_index':{'id':'routes/_index','parentId':'root','path':undefined,'index':true,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-l0sNRNKZ.js','imports':[],'css':[]},'routes/events':{'id':'routes/events','parentId':'root','path':'events','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-D3PE5biG.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/error-components-Cog0L8rg.js','/assets/card-skeletons-Xm5LnyUO.js'],'css':[]},'routes/users':{'id':'routes/users','parentId':'root','path':'users','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-Bd8WVu0K.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/error-components-Cog0L8rg.js','/assets/card-skeletons-Xm5LnyUO.js'],'css':[]}},'url':'/assets/manifest-bbaad2f3.js','version':'bbaad2f3'};
+const serverManifest = {'entry':{'module':'/assets/entry.client-DU6FvMMA.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/context-DCszVdUq.js'],'css':[]},'routes':{'root':{'id':'root','parentId':undefined,'path':'','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':false,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/root-CHg5AuAa.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/context-DCszVdUq.js','/assets/error-components-CWSJ1GAH.js'],'css':[]},'routes/_index':{'id':'routes/_index','parentId':'root','path':undefined,'index':true,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-l0sNRNKZ.js','imports':[],'css':[]},'routes/events':{'id':'routes/events','parentId':'root','path':'events','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-DCAyaLTR.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/error-components-CWSJ1GAH.js','/assets/card-skeletons-BYckk0mK.js'],'css':[]},'routes/users':{'id':'routes/users','parentId':'root','path':'users','index':undefined,'caseSensitive':undefined,'hasAction':false,'hasLoader':true,'hasClientAction':false,'hasClientLoader':false,'hasErrorBoundary':false,'module':'/assets/route-DniXV1cF.js','imports':['/assets/emotion-element-5486c51c.browser.esm-aXdZ-i2G.js','/assets/error-components-CWSJ1GAH.js','/assets/card-skeletons-BYckk0mK.js'],'css':[]}},'url':'/assets/manifest-89a7f7da.js','version':'89a7f7da'};
 
 /**
        * `mode` is only relevant for the old Remix compiler but

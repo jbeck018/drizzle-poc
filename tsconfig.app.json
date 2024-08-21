@@ -26,7 +26,7 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "#*": ["./*"]
     }
   },
   "include": ["remix.env.d.ts", "app", "db", "temporal", "graphql"],

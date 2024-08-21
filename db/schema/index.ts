@@ -1,55 +1,268 @@
-import { integer, index, timestamp, serial, text, pgTable, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
-import { relations, InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
+import {
+	boolean,
+	customType,
+	index,
+	integer,
+	numeric,
+	pgEnum,
+	pgTable,
+	serial,
+	text,
+	timestamp,
+	uniqueIndex,
+	uuid,
+	varchar,
+} from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  email: text('email').notNull(),
-  firstName: text('firstName').notNull(),
-  lastName: text('lastName').notNull(),
-  phoneNumber: text('phoneNumber').notNull(),
-  image: text('image'),
-}, (table) => {
-    return {
-      firstNameIdx: index("first_name_idx").on(table.firstName),
-      lastNameIdx: index("last_name_idx").on(table.lastName),
-      emailIdx: uniqueIndex("email_idx").on(table.email),
-    };
-  });
+const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
+	dataType() {
+		return "bytea";
+	},
+});
+
+// User Table
+export const users = pgTable(
+	"users",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		email: varchar("email", { length: 255 }).notNull(),
+		username: varchar("username", { length: 255 }),
+		customer_id: varchar("customer_id", { length: 255 }),
+		first_name: text("first_name").notNull(),
+		last_name: text("last_name").notNull(),
+		phone_number: text("phone_number").notNull(),
+		image: text("image"),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		email_idx: uniqueIndex("email_idx").on(table.email),
+		username_idx: uniqueIndex("username_idx").on(table.username),
+		customer_id_idx: uniqueIndex("customer_id_idx").on(table.customer_id),
+		first_name_idx: index("first_name_idx").on(table.first_name),
+		last_name_idx: index("last_name_idx").on(table.last_name),
+	}),
+);
 
 export const userSchema = createSelectSchema(users);
 export type User = InferSelectModel<typeof users>;
 export type CreateUser = InferInsertModel<typeof users>;
 
+// User Image Table
+export const user_images = pgTable(
+	"user_images",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		alt_text: text("alt_text"),
+		content_type: varchar("content_type", { length: 255 }).notNull(),
+		blob: bytea("blob").notNull(),
+		user_id: uuid("user_id").notNull(),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		user_id_idx: uniqueIndex("user_id_idx").on(table.user_id),
+	}),
+);
+
+export const userImageSchema = createSelectSchema(user_images);
+export type UserImage = InferSelectModel<typeof user_images>;
+export type CreateUserImage = InferInsertModel<typeof user_images>;
+
+// Role Table
+export const roles = pgTable(
+	"roles",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		name: varchar("name", { length: 255 }).notNull(),
+		description: text("description").default(""),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		name_idx: uniqueIndex("name_idx").on(table.name),
+	}),
+);
+
+export const roleSchema = createSelectSchema(roles);
+export type Role = InferSelectModel<typeof roles>;
+export type CreateRole = InferInsertModel<typeof roles>;
+
+// Permission Table
+export const permissions = pgTable(
+	"permissions",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		entity: varchar("entity", { length: 255 }).notNull(),
+		action: varchar("action", { length: 255 }).notNull(),
+		access: varchar("access", { length: 255 }).notNull(),
+		description: text("description").default(""),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		action_entity_access_idx: uniqueIndex("action_entity_access_idx").on(
+			table.action,
+			table.entity,
+			table.access,
+		),
+	}),
+);
+
+export const permissionSchema = createSelectSchema(permissions);
+export type Permission = InferSelectModel<typeof permissions>;
+export type CreatePermission = InferInsertModel<typeof permissions>;
+
+// Plan Table
+export const plans = pgTable("plans", {
+	id: uuid("id").defaultRandom().primaryKey(),
+	name: varchar("name", { length: 255 }).notNull(),
+	description: text("description"),
+	created_at: timestamp("created_at").notNull().defaultNow(),
+	updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const planSchema = createSelectSchema(plans);
+export type Plan = InferSelectModel<typeof plans>;
+export type CreatePlan = InferInsertModel<typeof plans>;
+
+// Price Table
+export const prices = pgTable(
+	"prices",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		plan_id: uuid("plan_id").notNull(),
+		amount: integer("amount").notNull(),
+		currency: varchar("currency", { length: 255 }).notNull(),
+		interval: varchar("interval", { length: 255 }).notNull(),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		plan_id_idx: index("plan_id_idx").on(table.plan_id),
+	}),
+);
+
+export const priceSchema = createSelectSchema(prices);
+export type Price = InferSelectModel<typeof prices>;
+export type CreatePrice = InferInsertModel<typeof prices>;
+
+// Subscription Table
+export const subscriptions = pgTable(
+	"subscriptions",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		user_id: uuid("user_id").notNull(),
+		plan_id: uuid("plan_id").notNull(),
+		price_id: uuid("price_id").notNull(),
+		interval: varchar("interval", { length: 255 }).notNull(),
+		status: varchar("status", { length: 255 }).notNull(),
+		current_period_start: integer("current_period_start").notNull(),
+		current_period_end: integer("current_period_end").notNull(),
+		cancel_at_period_end: boolean("cancel_at_period_end").default(false),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		user_id__subscription_idx: uniqueIndex("user_id__subscription_idx").on(
+			table.user_id,
+		),
+		subscription_plan_id_idx: index("subscription_plan_id_idx").on(
+			table.plan_id,
+		),
+		price_id_idx: index("price_id_idx").on(table.price_id),
+	}),
+);
+
+export const subscriptionSchema = createSelectSchema(subscriptions);
+export type Subscription = InferSelectModel<typeof subscriptions>;
+export type CreateSubscription = InferInsertModel<typeof subscriptions>;
+
+// Record Type Enum
+export const record_type_enum_values = [
+	"account",
+	"user",
+	"contact",
+	"opportunity",
+	"task",
+	"ticket",
+] as const;
+export const record_type_enum = pgEnum("record_type", record_type_enum_values);
+export const record_type_zod_enum = z.enum(record_type_enum.enumValues);
+
+// Records Table
+export const records = pgTable(
+	"records",
+	{
+		id: serial("id").primaryKey(),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+		record_type: record_type_enum("record_type").notNull(),
+	},
+	(table) => ({
+		record_type_idx: index("record_type_idx").on(table.record_type),
+	}),
+);
+
+export const recordsSchema = createSelectSchema(records);
+export type Record = InferSelectModel<typeof records>;
+export type CreateRecord = InferInsertModel<typeof records>;
+
+// Property Type Enum
+export const property_type_enum_values = [
+	"text",
+	"date",
+	"boolean",
+	"number",
+] as const;
+export const property_type_enum = pgEnum(
+	"property_type",
+	property_type_enum_values,
+);
+export const property_type_zod_enum = z.enum(property_type_enum.enumValues);
+
+// Properties Table
+export const properties = pgTable(
+	"properties",
+	{
+		id: serial("id").primaryKey(),
+		created_at: timestamp("created_at").notNull().defaultNow(),
+		updated_at: timestamp("updated_at").notNull().defaultNow(),
+		property_type: property_type_enum("property_type").notNull(),
+		text_value: varchar("text_value", { length: 65535 }),
+		date_value: timestamp("date_value", { withTimezone: false }),
+		boolean_value: boolean("boolean_value"),
+		number_value: numeric("number_value", { precision: 30, scale: 2 }),
+		record_id: integer("record_id").notNull(),
+		source: varchar("source", { length: 255 }),
+		key: varchar("key", { length: 255 }),
+	},
+	(table) => ({
+		property_type_idx: index("property_type_idx").on(table.property_type),
+		record_id_idx: index("record_id_idx").on(table.record_id),
+		key_idx: index("key_idx").on(table.key),
+	}),
+);
+
+export const propertiesSchema = createSelectSchema(properties);
+export type Property = InferSelectModel<typeof properties>;
+export type CreateProperty = InferInsertModel<typeof properties>;
+
+// Relations
 export const usersRelations = relations(users, ({ many }) => ({
-  events: many(events),
+	user_images: many(user_images),
 }));
 
-export const eventTypeEnumValues = ['page_view', 'click', 'bounce', 'logged_in', 'signed_up', 'subscribed'] as const;
-export const eventType = pgEnum('eventType', eventTypeEnumValues);
-export const eventTypeEnum = z.enum(eventType.enumValues);
+export const recordsRelations = relations(records, ({ many }) => ({
+	properties: many(properties),
+}));
 
-export const events = pgTable('events', {
-  id: serial('id').primaryKey(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  content: text('content').notNull(),
-  userId: integer('userId').notNull(),
-  eventType: eventType('eventType'),
-  url: text('url'),
-}, (table) => {
-    return {
-      userIdx: index("user_event_idx").on(table.userId),
-    };
-  });
-
-export const eventsSchema = createSelectSchema(events);
-export type Event = InferSelectModel<typeof events>;
-export type CreateEvent = InferInsertModel<typeof events>;
-
-export const eventsRelation = relations(events, ({ one }) => ({
-  user: one(users, { fields: [events.userId], references: [users.id] }),
+export const propertiesRelations = relations(properties, ({ one }) => ({
+	record: one(records, {
+		fields: [properties.record_id],
+		references: [records.id],
+	}),
 }));

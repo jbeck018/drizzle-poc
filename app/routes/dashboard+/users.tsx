@@ -1,13 +1,13 @@
-import { Card, CardHeader, Text, Avatar, Box, Flex, Heading } from '@chakra-ui/react'
-import { Suspense, useEffect, useState } from 'react'
-import { ErrorComponent, ListContainer, ListContainerWithSearch, CardSkeletonList } from '../../components';
-import { Await, useSearchParams } from "@remix-run/react";
+import { Avatar, Box, Card, CardHeader, Flex, Heading, Text } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
 import { json } from "@remix-run/node"; // or cloudflare/deno
+import { Await, useSearchParams } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { ilike, or } from 'drizzle-orm';
+import { Suspense, useEffect, useState } from 'react'
 import { db } from '../../../db/db.server';
 import { users } from '../../../db/schema';
+import { CardSkeletonList, ErrorComponent, ListContainer, ListContainerWithSearch } from '../../components';
 
 export const loader = async ({
     request
