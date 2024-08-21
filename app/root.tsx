@@ -38,7 +38,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
         where: (users, { eq }) => eq(users.id,sessionUser?.id),
         with: {
           image: true,
-          roles: true,
+          roles: {
+            with: {
+              role: true,
+            }
+          },
         }
       })
     : null

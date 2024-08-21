@@ -18,7 +18,11 @@ export const loader = async ({
         where: or(ilike(users.first_name, `%${term}%`), ilike(users.last_name, `%${term}%`), ilike(users.email, `%${term}%`)),
         with: {
             image: true,
-            roles: true,
+                      roles: {
+            with: {
+              role: true,
+            }
+          },
           },
         limit: 100,
     })

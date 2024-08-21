@@ -40,7 +40,11 @@ authenticator.use(
 				where: (users, { eq }) => eq(users.email, email),
 				with: {
 					image: true,
-					roles: true,
+					roles: {
+						with: {
+							role: true,
+						},
+					},
 				},
 			});
 
@@ -75,7 +79,11 @@ authenticator.use(
 				where: (users, { eq }) => eq(users.email, email),
 				with: {
 					image: true,
-					roles: true,
+					roles: {
+						with: {
+							role: true,
+						},
+					},
 				},
 			});
 
@@ -120,7 +128,11 @@ export async function requireUser(
 				where: (users, { eq }) => eq(users.id, sessionUser?.id),
 				with: {
 					image: true,
-					roles: true,
+					roles: {
+						with: {
+							role: true,
+						},
+					},
 				},
 			})
 		: null;

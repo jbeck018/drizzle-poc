@@ -1,9 +1,16 @@
 import { Interval, PRICING_PLANS } from "#app/modules/stripe/plans";
 import { stripe } from "#app/modules/stripe/stripe.server";
 import { db } from "../db.server";
-import { permissions, plans, roles, users } from "../schema";
+import {
+	permissions,
+	plans,
+	prices as pricesTable,
+	roles,
+	users,
+} from "../schema";
+import { rolesToPermissions, usersToRoles } from "./../schema/index";
 
-async function seed() {
+export async function seedUserAndStripe() {
 	/**
 	 * Users, Roles, and Permissions.
 	 */
@@ -19,7 +26,7 @@ async function seed() {
 		}
 	}
 
-	const allPermissions = await db.select().from(permissions).all();
+	const allPermissions = await db.query.permissions.findMany();
 
 	const adminPermissions = allPermissions
 		.filter((p) => p.access === "any")
@@ -28,21 +35,45 @@ async function seed() {
 		.filter((p) => p.access === "own")
 		.map((p) => p.id);
 
-	await db.insert(roles).values({
-		name: "admin",
-		permissions: { connect: adminPermissions.map((id: string) => ({ id })) },
-	});
+	const adminRole = await db
+		.insert(roles)
+		.values({ name: "admin" })
+		.returning();
 
-	await db.insert(roles).values({
-		name: "user",
-		permissions: { connect: userPermissions.map((id: string) => ({ id })) },
-	});
+	await Promise.all(
+		adminPermissions.map(
+			async (id: string) =>
+				await db.insert(rolesToPermissions).values({
+					role_id: adminRole[0]?.id,
+					permission_id: id,
+				}),
+		),
+	);
 
-	await db.insert(users).values({
-		email: "admin@admin.com",
-		username: "admin",
-		roles: { connect: [{ name: "admin" }, { name: "user" }] },
-	});
+	const userRole = await db.insert(roles).values({ name: "user" }).returning();
+
+	await Promise.all(
+		userPermissions.map(
+			async (id: string) =>
+				await db.insert(rolesToPermissions).values({
+					role_id: userRole[0]?.id,
+					permission_id: id,
+				}),
+		),
+	);
+
+	const user = await db
+		.insert(users)
+		.values({
+			email: "admin@admin.com",
+			username: "admin",
+		})
+		.returning();
+
+	await db.insert(usersToRoles).values([
+		{ user_id: user?.[0].id, role_id: adminRole?.[0].id },
+		{ user_id: user?.[0].id, role_id: userRole?.[0].id },
+	]);
 
 	console.info(`🎭 User roles and permissions have been successfully created.`);
 
@@ -86,19 +117,24 @@ async function seed() {
 				),
 			);
 
-			await db.insert(plans).values({
-				id,
-				name,
-				description,
-				prices: {
-					create: stripePrices.map((price: (typeof stripePrices)[number]) => ({
-						id: price.id,
-						amount: price.unit_amount ?? 0,
-						currency: price.currency,
-						interval: price.recurring?.interval ?? "month",
-					})),
-				},
-			});
+			const plan = await db
+				.insert(plans)
+				.values({
+					id,
+					name,
+					description,
+				})
+				.returning();
+
+			await db.insert(pricesTable).values(
+				stripePrices.map((price: (typeof stripePrices)[number]) => ({
+					id: price.id,
+					amount: price.unit_amount ?? 0,
+					currency: price.currency,
+					interval: price.recurring?.interval ?? "month",
+					plan_id: plan?.[0]?.id,
+				})),
+			);
 
 			return {
 				product: id,
@@ -139,8 +175,3 @@ async function seed() {
 		"🎉 Visit: https://dashboard.stripe.com/test/products to see your products.",
 	);
 }
-
-seed().catch((err: unknown) => {
-	console.error(err);
-	process.exit(1);
-});
