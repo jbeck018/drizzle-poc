@@ -1,54 +1,34 @@
-import { Icon, Tooltip } from '@chakra-ui/react';
-import styled from '@emotion/styled'
-import { startCase } from 'lodash-es';
-import { NavLink, Outlet } from "@remix-run/react";
+import { Flex } from '@chakra-ui/react';
+import { Outlet, useLocation } from "@remix-run/react";
+import {AnimatePresence, motion} from 'framer-motion';
+import { Container, Nav, NavItem, Page } from './shared-components';
+import { IconItem } from './types';
 
-import { IconType } from 'react-icons/lib';
-
-const Container = styled.div`
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
-`
-
-const Page = styled.div`
-    width: calc(100vw - 40px);
-    padding: 20px;
-`
-
-const Nav = styled.nav`
-    width: 60px;
-    height: 100%;
-    box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    gap: 40px;
-    padding-top: 25px;
-`
-
-type IconItem = {
-    route: string;
-    icon: IconType;
-    name: string;
-}
-
-export const Navigation = ({ items }: { items: IconItem[]; }) => {
+export const Navigation = ({ topItems, bottomItems }: { topItems: IconItem[]; bottomItems: IconItem[] }) => {
+    const location = useLocation();
     return (
         <Container>
             <Nav>
-                {items.map(item => (
-                    <Tooltip hasArrow key={item.name} placement='right' label={startCase(item.name)}>
-                        <NavLink to={`/${item.route}`}>
-                            <Icon height={8} width={8} as={item.icon} />
-                        </NavLink>
-                    </Tooltip>
-                ))}
+                <Flex direction='column' gap={5} marginTop={5}>
+                    {topItems.map(item => NavItem(item))}
+                </Flex>
+                <Flex direction='column' gap={5} marginBottom={5}>
+                    {bottomItems.map(item => NavItem(item))}
+                </Flex>
             </Nav>
             <Page>
-                <Outlet />
+                <AnimatePresence mode='wait' initial={false}>
+                    <motion.div
+                        key={location.pathname}
+                        initial={{x: '-10%', opacity: 0}}
+                        // initial={false}
+                        animate={{x: '0', opacity: 1}}
+                        exit={{y: '-10%', opacity: 0}}
+                        transition={{duration: 0.3}}
+                    >
+                        <Outlet />
+                    </motion.div>
+                </AnimatePresence>
             </Page>
         </Container>
     )

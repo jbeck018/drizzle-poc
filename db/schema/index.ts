@@ -75,6 +75,13 @@ export const user_images = pgTable(
 	}),
 );
 
+export const userImageRelations = relations(user_images, ({ one }) => ({
+	user: one(users, {
+		references: [users.id],
+		fields: [user_images.user_id],
+	}),
+}));
+
 export const userImageSchema = createSelectSchema(user_images);
 export type UserImage = InferSelectModel<typeof user_images>;
 export type CreateUserImage = InferInsertModel<typeof user_images>;

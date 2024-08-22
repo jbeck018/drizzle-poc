@@ -9,6 +9,8 @@ import { db } from '../../../db/db.server';
 import { users } from '../../../db/schema';
 import { CardSkeletonList, ErrorComponent, ListContainer, ListContainerWithSearch } from '../../components';
 
+export const ROUTE_PATH = '/dashboard/users' as const
+
 export const loader = async ({
     request
   }: LoaderFunctionArgs) => {

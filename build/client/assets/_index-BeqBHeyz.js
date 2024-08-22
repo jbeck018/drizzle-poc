@@ -1,0 +1,1 @@
+import{j as t}from"./jsx-runtime-DEmlPpso.js";function r(){return t.jsxs("div",{className:"flex w-full flex-col gap-2 p-6 py-2",children:[t.jsx("h2",{className:"text-xl font-medium text-primary",children:"Get Started"}),t.jsx("p",{className:"text-sm font-normal text-primary/60",children:"Explore the Admin Panel and get started with your first app."})]})}export{r as default};

@@ -1,3 +1,4 @@
+import { Button, Flex } from '@chakra-ui/react'
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -6,7 +7,6 @@ import type {
 import { json, redirect } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
-import { Button } from '#app/components/ui/button'
 import { Switch } from '#app/components/ui/switch'
 import { requireSessionUser } from '#app/modules/auth/auth.server'
 import type { Interval, Plan } from '#app/modules/stripe/plans'
@@ -23,7 +23,7 @@ import { db } from '#db/db.server'
 export const ROUTE_PATH = '/dashboard/settings/billing' as const
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Remix SaaS - Billing' }]
+  return [{ title: 'Funnel Intelligence - Billing' }]
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -82,8 +82,8 @@ export default function DashboardBilling() {
   )
 
   return (
-    <div className="flex h-full w-full flex-col gap-6">
-      <div className="flex w-full flex-col gap-2 p-6 py-2">
+    <Flex width='100%' height='100%' direction='column' padding={20} gap={10}>
+      <Flex width='100%' height='100%' direction='column'>
         <h2 className="text-xl font-medium text-primary">This is a demo app.</h2>
         <p className="text-sm font-normal text-primary/60">
           Remix SaaS is a demo app that uses Stripe test environment. You can find a list
@@ -97,10 +97,10 @@ export default function DashboardBilling() {
           </a>
           .
         </p>
-      </div>
+      </Flex>
 
       {/* Plans */}
-      <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
+      <Flex width='100%' direction='column' alignItems='start' border='1px solid' borderRadius={4}>
         <div className="flex flex-col gap-2 p-6">
           <h2 className="text-xl font-medium text-primary">Plan</h2>
           <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
@@ -174,7 +174,7 @@ export default function DashboardBilling() {
         )}
 
         {subscription && subscription.plan_id !== PLANS.FREE && (
-          <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
+          <Flex width='100%' direction='column' alignItems='start' border='1px solid' borderRadius={4}>
             <div className="flex w-full items-center overflow-hidden rounded-md border border-primary/60">
               <div className="flex w-full flex-col items-start p-4">
                 <div className="flex items-end gap-2">
@@ -204,10 +204,10 @@ export default function DashboardBilling() {
                 </p>
               </div>
             </div>
-          </div>
+          </Flex>
         )}
 
-        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 py-3 dark:bg-card">
+        <Flex width='100%' alignItems='center' justifyContent='space-between' borderTop='1px solid' padding={5}>
           <p className="text-sm font-normal text-primary/60">
             You will not be charged for testing the subscription upgrade.
           </p>
@@ -225,11 +225,11 @@ export default function DashboardBilling() {
               </Button>
             </Form>
           )}
-        </div>
-      </div>
+        </Flex>
+      </Flex>
 
       {/* Manage Subscription */}
-      <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
+      <Flex width='100%' direction='column' alignItems='start' border='1px solid' borderRadius={4}>
         <div className="flex flex-col gap-2 p-6">
           <h2 className="text-xl font-medium text-primary">Manage Subscription</h2>
           <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
@@ -251,7 +251,7 @@ export default function DashboardBilling() {
             </Button>
           </Form>
         </div>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   )
 }

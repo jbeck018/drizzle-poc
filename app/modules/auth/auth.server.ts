@@ -109,6 +109,9 @@ export async function requireUser(
 	const user = sessionUser?.id
 		? await db.query.users.findFirst({
 				where: (users, { eq }) => eq(users.id, sessionUser?.id),
+				with: {
+					image: true,
+				},
 			})
 		: null;
 	if (!user) {
