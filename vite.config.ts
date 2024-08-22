@@ -12,9 +12,9 @@ export default defineConfig(({ mode }) => ({
 	plugins: [
 		remixDevTools(),
 		remix({
-			basename: "/",
 			buildDirectory: "build",
-			ignoredRouteFiles: ["**/*.css"],
+			serverModuleFormat: "esm",
+			ignoredRouteFiles: ["**/.*", "**/*.css"],
 			routes: async (defineRoutes) => {
 				return flatRoutes("routes", defineRoutes);
 			},

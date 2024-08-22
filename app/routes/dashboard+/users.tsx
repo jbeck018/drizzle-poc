@@ -9,6 +9,8 @@ import { db } from '../../../db/db.server';
 import { users } from '../../../db/schema';
 import { CardSkeletonList, ErrorComponent, ListContainer, ListContainerWithSearch } from '../../components';
 
+export const ROUTE_PATH = '/dashboard/users' as const
+
 export const loader = async ({
     request
   }: LoaderFunctionArgs) => {
@@ -62,7 +64,7 @@ export const Users = () => {
                             {users && users?.length > 0 && (
                                 <ListContainer style={{ overflow: 'scroll', height: '100%' }}>
                                     {users.map(user => (
-                                        <Card variant='outline' key={user.id}>
+                                        <Card variant='outline' background={'transparent'} key={user.id}>
                                             <CardHeader>
                                                 <Flex gap='4'>
                                                 <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>

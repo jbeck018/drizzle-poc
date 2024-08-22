@@ -1,5 +1,7 @@
+import { Button, Center, Flex, Input, Text } from '@chakra-ui/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import styled from '@emotion/styled';
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -14,8 +16,6 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { z } from 'zod'
-import { Button } from '#app/components/ui/button'
-import { Input } from '#app/components/ui/input'
 import { requireSessionUser } from '#app/modules/auth/auth.server'
 import {
   createCustomer,
@@ -31,6 +31,14 @@ import { useIsPending } from '#app/utils/misc'
 import { users } from '#db/schema'
 
 export const ROUTE_PATH = '/onboarding/username' as const
+
+const StyledFrom = styled(Form)`
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+  width: 100%;
+`
 
 export const UsernameSchema = z.object({
   username: z
@@ -107,56 +115,58 @@ export default function OnboardingUsername() {
   }, [isHydrated])
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-96 flex-col items-center justify-center gap-6">
-      <div className="flex flex-col items-center gap-2">
-        <span className="mb-2 select-none text-6xl">👋</span>
-        <h3 className="text-center text-2xl font-medium text-primary">Welcome!</h3>
-        <p className="text-center text-base font-normal text-primary/60">
-          Let's get started by choosing a username.
-        </p>
-      </div>
+    <Flex width='100%' height='100%' direction='column' alignItems='center' justifyContent='center' gap={10}>
+      <Flex direction='column' alignItems='start' maxWidth={600} gap={5}>
+        <Flex direction='column' alignItems='start' gap={2}>
+          <Center>
+            <span className="mb-2 select-none text-6xl">👋</span>
+          </Center>
+          <Text as='h3' fontSize='2xl'>Welcome!</Text>
+          <p>
+            Let's get started by choosing a username.
+          </p>
+        </Flex>
 
-      <Form
-        method="POST"
-        autoComplete="off"
-        className="flex w-full flex-col items-start gap-1"
-        {...getFormProps(form)}>
-        {/* Security */}
-        <AuthenticityTokenInput />
-        <HoneypotInputs />
+        <StyledFrom
+          method="POST"
+          autoComplete="off"
+          {...getFormProps(form)}
+        >
+          {/* Security */}
+          <AuthenticityTokenInput />
+          <HoneypotInputs />
 
-        <div className="flex w-full flex-col gap-1.5">
-          <label htmlFor="username" className="sr-only">
-            Username
-          </label>
-          <Input
-            placeholder="Username"
-            autoComplete="off"
-            ref={inputRef}
-            required
-            className={`bg-transparent ${
-              username.errors && 'border-destructive focus-visible:ring-destructive'
-            }`}
-            {...getInputProps(username, { type: 'text' })}
-          />
-        </div>
+          <Flex maxWidth={400} width='100%' direction='column' gap={5}>
+            <label htmlFor="username" className="sr-only">
+              Username
+            </label>
+            <Input
+              style={{ width: '100%' }}
+              placeholder="Username"
+              autoComplete="off"
+              ref={inputRef}
+              required
+              {...getInputProps(username, { type: 'text' })}
+            />
+          </Flex>
 
-        <div className="flex flex-col">
-          {username.errors && (
-            <span className="mb-2 text-sm text-destructive dark:text-destructive-foreground">
-              {username.errors.join(' ')}
-            </span>
-          )}
-        </div>
+          <Flex maxWidth={400} direction='column'>
+            {username.errors && (
+              <span className="mb-2 text-sm text-destructive dark:text-destructive-foreground">
+                {username.errors.join(' ')}
+              </span>
+            )}
+          </Flex>
 
-        <Button type="submit" size="sm" className="w-full">
-          {isPending ? <Loader2 className="animate-spin" /> : 'Continue'}
-        </Button>
-      </Form>
+          <Button type="submit" size="sm" width='100%' maxWidth={400}>
+            {isPending ? <Loader2 className="animate-spin" /> : 'Continue'}
+          </Button>
+        </StyledFrom>
 
-      <p className="px-6 text-center text-sm font-normal leading-normal text-primary/60">
-        You can update your username at any time from your account settings.
-      </p>
-    </div>
+        <Text as='p' fontSize='small' style={{ maxWidth: 400, textOverflow: 'wrap' }}>
+          You can update your username at any time from your account settings.
+        </Text>
+      </Flex>
+    </Flex>
   )
 }

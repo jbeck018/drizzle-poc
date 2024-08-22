@@ -1,5 +1,4 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { extendTheme } from '@chakra-ui/react'
 import { withEmotionCache } from '@emotion/react';
 import { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Links, Outlet, Scripts, ScrollRestoration, json, useLoaderData } from "@remix-run/react";
@@ -15,6 +14,7 @@ import { GenericErrorBoundary } from "./components/misc/error-boundary";
 import { ClientStyleContext, ServerStyleContext } from './context';
 import indexStyles from './index.css?url';
 import { authenticator } from "./modules/auth/auth.server";
+import theme from "./theme/theme";
 import { csrf } from "./utils/csrf.server";
 import { useNonce } from "./utils/hooks/use-nonce";
 import { combineHeaders, getDomainUrl } from "./utils/misc.server";
@@ -69,16 +69,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   )
 }
 
-const colors = {
-  brand: {
-    900: '#1a365d',
-    800: '#153e75',
-    700: '#2a69ac',
-  },
-}
-
-const theme = extendTheme({ colors })
-
 const Root = withEmotionCache((_, emotionCache) => {
   const { toast, csrfToken, honeypotProps } = useLoaderData<typeof loader>()
   const nonce = useNonce()
@@ -102,7 +92,7 @@ const Root = withEmotionCache((_, emotionCache) => {
   
   return (
     <html lang="en">
-      <head>
+      <head style={{ height: '100vh', width: '100vw' }}>
         <meta charSet="utf-8" />
         <meta
           name="viewport"
@@ -123,8 +113,8 @@ const Root = withEmotionCache((_, emotionCache) => {
           />
         ))}
       </head>
-      <body>
-        <div id="root">
+      <body style={{ height: '100vh', width: '100vw' }}> 
+        <div id="root" style={{ height: '100vh', width: '100vw' }}>
             <ChakraProvider theme={theme}>
               <HoneypotProvider {...honeypotProps}>
                 <AuthenticityTokenProvider token={csrfToken}>

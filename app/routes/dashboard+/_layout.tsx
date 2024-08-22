@@ -1,30 +1,34 @@
-import { FaUserAlt } from "react-icons/fa";
-import { FaBoltLightning } from "react-icons/fa6";
+import { Home, Settings, Users } from "lucide-react";
 import { Navigation } from '#app/components/navigations';
+import { ROUTE_PATH as SETTINGS_ROUTE } from "./settings";
+import { ROUTE_PATH as USERS_ROUTE } from './users';
 
 export const ROUTE_PATH = '/dashboard' as const
 
-const ROUTES = {
-  users: "users",
-  events: "events",
-}
-
-const navItems = [
+const topItems = [
   {
-    route: ROUTE_PATH + ROUTES.users,
-    icon: FaUserAlt,
+    route: ROUTE_PATH,
+    icon: Home,
+    name: 'Home',
+  },
+  {
+    route: USERS_ROUTE,
+    icon: Users,
     name: 'Users',
   },
-  {
-    route: ROUTE_PATH + ROUTES.events,
-    icon: FaBoltLightning,
-    name: 'Events',
-  },
 ];
+
+const bottomItems = [
+  {
+    route: SETTINGS_ROUTE,
+    icon: Settings,
+    name: 'Settings',
+  },
+]
 
 export default function Dashboard() {
 
   return (
-      <Navigation items={navItems} />
+      <Navigation topItems={topItems} bottomItems={bottomItems} />
   )
 }

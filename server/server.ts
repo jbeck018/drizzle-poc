@@ -98,7 +98,6 @@ app.use((_, res, next) => {
 	next();
 });
 
-// handle asset requests for vite.
 // handle asset requests
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares);
@@ -112,6 +111,19 @@ if (viteDevServer) {
 	);
 }
 app.use(express.static("build/client", { maxAge: "1h" }));
+
+/**
+ * Clean route paths. (No ending slashes, Better SEO)
+ */
+app.use((req, res, next) => {
+	if (req.path.endsWith("/") && req.path.length > 1) {
+		const query = req.url.slice(req.path.length);
+		const safePath = req.path.slice(0, -1).replace(/\/+/g, "/");
+		res.redirect(301, safePath + query);
+	} else {
+		next();
+	}
+});
 
 // handle SSR requests
 app.all(

@@ -1,8 +1,8 @@
-import { Image } from '@chakra-ui/react'
+import { Divider, Flex, Image } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { Outlet } from '@remix-run/react'
-import Logo from '#app/assets/logo.png'
+import Logo from '#app/assets/logo_transparent.png'
 import { requireUser } from '#app/modules/auth/auth.server'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
 import { ROUTE_PATH as ONBOARDING_USERNAME_PATH } from '#app/routes/onboarding+/username'
@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const isOnboardingPathname = pathname === ROUTE_PATH
   const isOnboardingUsernamePathname = pathname === ONBOARDING_USERNAME_PATH
 
-  if (isOnboardingPathname) return redirect(DASHBOARD_PATH)
+  if (isOnboardingPathname && !user.username) return redirect(ONBOARDING_USERNAME_PATH)
   if (user.username && isOnboardingUsernamePathname) return redirect(DASHBOARD_PATH)
 
   return json({})
@@ -25,15 +25,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Onboarding() {
   return (
-    <div className="relative flex h-screen w-full bg-card">
-      <div className="absolute left-1/2 top-8 mx-auto -translate-x-1/2 transform justify-center">
+    <Flex width='100vw' height='100vh' direction={'row'} alignItems={'center'} justifyContent={'start'}>
+      <Flex 
+        padding='10' 
+        direction={'column'} 
+        alignItems={'center'} 
+        justifyContent='center' 
+        height={'100%'} 
+        maxWidth={600}
+        background={'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)'}
+      >
         <Image src={Logo} />
-      </div>
-      <div className="z-10 h-screen w-screen">
-        <Outlet />
-      </div>
-      <div className="base-grid fixed h-screen w-screen opacity-40" />
-      <div className="fixed bottom-0 h-screen w-screen bg-gradient-to-t from-[hsl(var(--card))] to-transparent" />
-    </div>
+      </Flex>
+      <Divider orientation='vertical' padding='10px' borderLeftWidth={2} height={'98%'} />
+      <Outlet />
+    </Flex>
   )
 }

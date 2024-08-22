@@ -17,7 +17,7 @@ export type ListContainerWithSearchProps = {
 export const ListContainerWithSearch = ({ searchTerm, onChange, children }: ListContainerWithSearchProps) => {
 
     return(
-        <ListContainer>
+        <ListContainer style={{ padding: 20 }}>
             <Input style={{ height: 40, minHeight: 40, borderRadius: 4 }} placeholder='Type to search...' value={searchTerm || ''} onChange={e => onChange(e.target.value)} />
             {children}
         </ListContainer>
