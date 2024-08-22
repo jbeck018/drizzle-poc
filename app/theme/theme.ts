@@ -4,7 +4,9 @@ import { fonts } from "./fonts";
 import { globalStyles } from "./styles/globals";
 
 const theme: ThemeConfig = extendTheme({
-	global: globalStyles,
+	styles: {
+		global: globalStyles,
+	},
 	fonts: fonts,
 	colors,
 });

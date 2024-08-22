@@ -7,9 +7,7 @@ export const ROUTE_PATH = '/' as const
 
 export const loader: LoaderFunction = async ({ request }) => {
   const sessionUser = await authenticator.isAuthenticated(request)
-  if (sessionUser) {
-    return redirect(`/dashboard`);
-  } else {
-    return redirect('/onboarding');
+  if (!sessionUser) {
+    return redirect(`/auth/login`);
   }
 };

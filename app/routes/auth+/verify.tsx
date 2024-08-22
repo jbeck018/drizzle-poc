@@ -17,9 +17,10 @@ import { z } from 'zod'
 import { commitSession, getSession } from '#app/modules/auth/auth-session.server'
 import { authenticator } from '#app/modules/auth/auth.server'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
+import { ROUTE_PATH as ONBOARDING } from '#app/routes/onboarding+/_layout';
 import { siteConfig } from '#app/utils/constants/brand'
 import { validateCSRF } from '#app/utils/csrf.server'
-import { checkHoneypot } from '#app/utils/honeypot.server'
+import { checkHoneypot } from '#app/utils/honeypot.server';
 
 export const ROUTE_PATH = '/auth/verify' as const
 
@@ -32,9 +33,15 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    successRedirect: DASHBOARD_PATH,
-  })
+  const sessionUser = await authenticator.isAuthenticated(request)
+
+  if (sessionUser) {
+    if (sessionUser.username) {
+      redirect(DASHBOARD_PATH);
+    } else {
+      redirect(ONBOARDING);
+    }
+  }
 
   const cookie = await getSession(request.headers.get('Cookie'))
   const authEmail = cookie.get('auth:email')

@@ -4,6 +4,8 @@ import {AnimatePresence, motion} from 'framer-motion';
 import { Container, Nav, NavItem, Page } from './shared-components';
 import { IconItem } from './types';
 
+const MotionOutlet = motion(Outlet);
+
 export const Navigation = ({ topItems, bottomItems }: { topItems: IconItem[]; bottomItems: IconItem[] }) => {
     const location = useLocation();
     return (
@@ -18,16 +20,13 @@ export const Navigation = ({ topItems, bottomItems }: { topItems: IconItem[]; bo
             </Nav>
             <Page>
                 <AnimatePresence mode='wait' initial={false}>
-                    <motion.div
+                    <MotionOutlet
                         key={location.pathname}
-                        initial={{x: '-10%', opacity: 0}}
-                        // initial={false}
+                        initial={{x: '0', opacity: 0}}
                         animate={{x: '0', opacity: 1}}
-                        exit={{y: '-10%', opacity: 0}}
+                        exit={{y: '0', opacity: 0}}
                         transition={{duration: 0.3}}
-                    >
-                        <Outlet />
-                    </motion.div>
+                    />
                 </AnimatePresence>
             </Page>
         </Container>
