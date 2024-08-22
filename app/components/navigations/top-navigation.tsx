@@ -13,12 +13,11 @@ import {
   DropdownMenuTrigger,
 } from '#app/components/ui/dropdown-menu'
 import { PLANS } from '#app/modules/stripe/plans'
-import { ROUTE_PATH as ADMIN_PATH } from '#app/routes/admin+/_layout'
 import { ROUTE_PATH as LOGOUT_PATH } from '#app/routes/auth+/logout'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
 import { ROUTE_PATH as DASHBOARD_SETTINGS_PATH } from '#app/routes/dashboard+/settings'
 import { ROUTE_PATH as DASHBOARD_SETTINGS_BILLING_PATH } from '#app/routes/dashboard+/settings.billing'
-import { cn, getUserImgSrc, userHasRole } from '#app/utils/misc'
+import { cn, getUserImgSrc } from '#app/utils/misc'
 import { Role, User, UserImage } from '#db/schema'
 
 /**
@@ -40,7 +39,6 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
   const submit = useSubmit()
 
   const location = useLocation()
-  const isAdminPath = location.pathname === ADMIN_PATH
   const isDashboardPath = location.pathname === DASHBOARD_PATH
   const isSettingsPath = location.pathname === DASHBOARD_SETTINGS_PATH
   const isBillingPath = location.pathname === DASHBOARD_SETTINGS_BILLING_PATH
@@ -202,19 +200,6 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
       </div>
 
       <div className="mx-auto flex w-full max-w-screen-xl items-center gap-3">
-        {user && userHasRole(user as any, 'admin') && (
-          <div
-            className={`flex h-12 items-center border-b-2 ${isAdminPath ? 'border-primary' : 'border-transparent'}`}>
-            <Link
-              to={ADMIN_PATH}
-              prefetch="intent"
-              className={cn(
-                `${buttonVariants({ variant: 'ghost', size: 'sm' })} text-primary/80`,
-              )}>
-              Admin
-            </Link>
-          </div>
-        )}
         <div
           className={`flex h-12 items-center border-b-2 ${isDashboardPath ? 'border-primary' : 'border-transparent'}`}>
           <Link
