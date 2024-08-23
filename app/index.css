@@ -15,8 +15,10 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background: #F8F7F4;
-  background-color: #F8F7F4;
+  /* background: #F8F7F4;
+  background-color: #F8F7F4; */
+  background: #FFF;
+  background-color: #FFF;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -31,14 +33,18 @@ body, html {
   margin: 0;
   width: 100vw;
   min-height: 100vh;
-  background: #F8F7F4;
-  background-color: #F8F7F4;
+  /* background: #F8F7F4;
+  background-color: #F8F7F4; */
+  background: #FFF;
+  background-color: #FFF;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background: #F8F7F4;
-    background-color: #F8F7F4;
+  /* background: #F8F7F4;
+  background-color: #F8F7F4; */
+  background: #FFF;
+  background-color: #FFF;
   }
 }

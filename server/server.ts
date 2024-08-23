@@ -5,7 +5,7 @@ import { installGlobals } from "@remix-run/node";
 import compression from "compression";
 import cors from "cors";
 import express from "express";
-// import helmet from "helmet";
+import helmet from "helmet";
 import pino from "pino-http";
 // import { buildSchema } from "drizzle-graphql";
 // import { createYoga } from "graphql-yoga";
@@ -56,9 +56,9 @@ app.use(compression());
 
 // app.use(
 // 	helmet({
+// 		referrerPolicy: { policy: "same-origin" },
+// 		crossOriginEmbedderPolicy: false,
 // 		contentSecurityPolicy: {
-// 			referrerPolicy: { policy: "same-origin" },
-// 			crossOriginEmbedderPolicy: false,
 // 			// ❗Important: Remove `reportOnly` to enforce CSP. (Development only).
 // 			reportOnly: true,
 // 			directives: {
@@ -93,10 +93,10 @@ app.use(compression());
  * Implementation based on github.com/epicweb-dev/epic-stack
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
  */
-app.use((_, res, next) => {
-	res.locals.cspNonce = crypto.randomBytes(16).toString("hex");
-	next();
-});
+// app.use((_, res, next) => {
+// 	res.locals.cspNonce = crypto.randomBytes(16).toString("hex");
+// 	next();
+// });
 
 // handle asset requests
 if (viteDevServer) {

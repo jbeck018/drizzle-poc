@@ -12,7 +12,7 @@ export const Container = styled.div`
 `
 
 export const Page = styled.div`
-    width: calc(100vw - 40px);
+    width: calc(100vw - 60px);
 `
 
 export const Nav = styled.nav<{ isInnerNav?: boolean }>`

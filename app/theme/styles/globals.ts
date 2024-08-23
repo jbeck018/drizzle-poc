@@ -1,12 +1,14 @@
+import { colors } from "../colors";
+
 export const globalStyles = {
 	// styles for the `body`
 	html: {
 		height: "100vh",
 		width: "100vw",
-		bg: "#F8F7F4",
+		bg: colors.background,
 	},
 	body: {
-		bg: "#F8F7F4",
+		bg: colors.background,
 		height: "100vh",
 		width: "100vw",
 	},

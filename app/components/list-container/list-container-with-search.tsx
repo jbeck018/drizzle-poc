@@ -1,11 +1,11 @@
 import { Input } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 
-export const ListContainer = styled.div<{ isWithSearch?: boolean }>`
+export const ListContainer = styled.div<{ isInner?: boolean }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: ${props => props?.isWithSearch ? 'calc(100% - 50px)' : '100%'};
+    height: ${props => props?.isInner ? 'calc(100% - 50px)' : '100%'};
 `
 
 export type ListContainerWithSearchProps = {
@@ -17,7 +17,7 @@ export type ListContainerWithSearchProps = {
 export const ListContainerWithSearch = ({ searchTerm, onChange, children }: ListContainerWithSearchProps) => {
 
     return(
-        <ListContainer isWithSearch style={{ padding: 20 }}>
+        <ListContainer style={{ padding: 20 }}>
             <Input style={{ height: 40, minHeight: 40, borderRadius: 4 }} placeholder='Type to search...' value={searchTerm || ''} onChange={e => onChange(e.target.value)} />
             {children}
         </ListContainer>

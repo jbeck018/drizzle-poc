@@ -1,12 +1,12 @@
 import { PassThrough } from "node:stream";
 
+import { CacheProvider } from '@emotion/react';
+import createEmotionServer from '@emotion/server/create-instance';
 import type { AppLoadContext, EntryContext } from "@remix-run/node";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { CacheProvider } from '@emotion/react';
-import createEmotionServer from '@emotion/server/create-instance';
 import createEmotionCache from './createEmotionCache';
 
 const ABORT_DELAY = 5_000;
@@ -119,6 +119,7 @@ function handleBrowserRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
+  
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const emotionCache = createEmotionCache();

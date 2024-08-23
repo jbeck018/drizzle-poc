@@ -16,7 +16,7 @@ export const loader = async ({
   }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
     const term = url.searchParams.get("query") || '';
-    const data = await db.query.users.findMany({
+    const data = Promise.resolve(db.query.users.findMany({
         where: or(ilike(users.first_name, `%${term}%`), ilike(users.last_name, `%${term}%`), ilike(users.email, `%${term}%`)),
         with: {
             roles: {
@@ -26,7 +26,7 @@ export const loader = async ({
             },
           },
         limit: 100,
-    })
+    }));
     
     if (!data) {
         throw json(
@@ -57,7 +57,7 @@ export const Users = () => {
             <Suspense fallback={<CardSkeletonList count={10} />}>
                 <Await resolve={users}>
                     {(users) => (
-                        <ListContainer>
+                        <ListContainer isInner>
                             {users && users?.length === 0 && (
                                 <ErrorComponent header='No Users found...' text='Try adjusting your query OR go get some users!' />
                             )}

@@ -132,5 +132,6 @@ export const colors = {
 		"800": "#621fa6",
 		"900": "#481779",
 	},
-	background: "#F8F7F4",
+	// background: "#F8F7F4",
+	background: "#FFF",
 };
