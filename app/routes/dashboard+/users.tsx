@@ -1,7 +1,7 @@
 import { Avatar, Box, Card, CardHeader, Flex, Heading, Text } from '@chakra-ui/react'
 import type { LoaderFunctionArgs } from "@remix-run/node"; // or cloudflare/deno
 import { json } from "@remix-run/node"; // or cloudflare/deno
-import { Await, useSearchParams } from "@remix-run/react";
+import { Await, defer, useSearchParams } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { ilike, or } from 'drizzle-orm';
 import { Suspense, useEffect, useState } from 'react'
@@ -35,7 +35,7 @@ export const loader = async ({
           );
     }
 
-    return json(data);
+    return defer({ data });
   };
 
 
@@ -50,7 +50,7 @@ export const Users = () => {
         });
     }, [searchTerm])
 
-    const users = useLoaderData<typeof loader>();
+    const { data: users } = useLoaderData<typeof loader>();
 
     return (
         <ListContainerWithSearch searchTerm={searchTerm} onChange={setSearchTerm}>

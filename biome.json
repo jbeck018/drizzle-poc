@@ -1,11 +1,11 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
 	"organizeImports": { "enabled": true },
-	"linter": { "enabled": false, "rules": { "recommended": false } },
+	"linter": { "enabled": true, "rules": { "recommended": false } },
 	"overrides": [
 		{
 			"ignore": ["dist"],
-			"include": ["**/*.{ts,tsx}"],
+			"include": ["**/*.{ts,tsx}", "**/**/*.{ts,tsx}"],
 			"linter": {
 				"rules": {
 					"complexity": {

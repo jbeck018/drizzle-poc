@@ -5,3 +5,4 @@ export * from "./skeletons";
 export * from "./toaster";
 export * from "./header";
 export * from "./ui";
+export * from "./table";
