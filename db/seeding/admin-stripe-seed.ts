@@ -1,3 +1,4 @@
+import Stripe from "stripe";
 import { Interval, PRICING_PLANS } from "../../app/modules/stripe/plans";
 import { stripe } from "../../app/modules/stripe/stripe.server";
 import { db } from "../db.server";
@@ -9,6 +10,7 @@ import {
 	users,
 } from "../schema";
 import { rolesToPermissions, usersToRoles } from "./../schema/index";
+import { sql } from "drizzle-orm";
 
 export async function seedUserAndStripe() {
 	let allPermissions = await db.query.permissions.findMany();
@@ -88,42 +90,54 @@ export async function seedUserAndStripe() {
 	/**
 	 * Stripe Products.
 	 */
-	const products = await stripe.products.list({ limit: 3 });
-	if (products?.data?.length) {
-		console.info("🏃‍♂️ Skipping Stripe products creation and seeding.");
-		return true;
-	}
+	const stripeProducts = await stripe.products.list({ limit: 10 });
+	const products = stripeProducts?.data;
 
 	const seedProducts = Object.values(PRICING_PLANS).map(
 		async ({ id, name, description, prices }) => {
 			const pricesByInterval = Object.entries(prices).flatMap(
 				([interval, price]) =>
-					Object.entries(price).map(([currency, amount]) => ({
+					Object.entries(price).map(([currency, { price: amount, price_id }]) => ({
 						interval,
 						currency,
 						amount,
+						price_id,
 					})),
 			);
 
-			await stripe.products.create({
-				id,
-				name,
-				description: description || undefined,
+			const pricesFromStripe = await stripe.prices.search({
+				query: `product:"${id}"`,
 			});
 
-			const stripePrices = await Promise.all(
-				pricesByInterval.map((price) =>
-					stripe.prices.create({
-						product: id,
-						currency: price.currency ?? "usd",
-						unit_amount: price.amount ?? 0,
-						tax_behavior: "inclusive",
-						recurring: {
-							interval: (price.interval as Interval) ?? "month",
-						},
+			let stripePrices: Stripe.Price[] = pricesFromStripe.data;
+
+			const alreadyExists = products.find((p) => p.id === id);
+			if (!alreadyExists) {
+				await stripe.products.create({
+					id,
+					name,
+					description: description || undefined,
+				});
+
+				stripePrices = await Promise.all(
+					pricesByInterval.map(async (price) => {
+						const stripePrice = await stripe.prices.create({
+							product: id,
+							currency: price.currency ?? "usd",
+							unit_amount: price.amount ?? 0,
+							tax_behavior: "inclusive",
+							recurring: {
+								interval: (price.interval as Interval) ?? "month",
+							},
+							metadata: {
+								price_id: price.price_id,
+							}
+						});
+						return stripePrice;
 					}),
-				),
-			);
+				);
+
+			}
 
 			const plan = await db
 				.insert(plans)
@@ -132,17 +146,34 @@ export async function seedUserAndStripe() {
 					name,
 					description,
 				})
+				.onConflictDoUpdate({
+					target: plans.id,
+					set: {
+						name,
+						description,
+					},
+				})
 				.returning();
 
 			await db.insert(pricesTable).values(
 				stripePrices.map((price: (typeof stripePrices)[number]) => ({
-					id: price.id,
+					id: price.metadata?.price_id,
+					price_id: price.id,
 					amount: price.unit_amount ?? 0,
 					currency: price.currency,
 					interval: price.recurring?.interval ?? "month",
 					plan_id: plan?.[0]?.id,
-				})),
-			);
+				}))
+			).onConflictDoUpdate({
+				target: pricesTable.id,
+				set: {
+					price_id: sql`EXCLUDED.price_id`,
+					amount: sql`EXCLUDED.amount`,
+					currency: sql`EXCLUDED.currency`,
+					interval: sql`EXCLUDED.interval`,
+					plan_id: sql`EXCLUDED.plan_id`,
+				},
+			});
 
 			return {
 				product: id,
@@ -150,8 +181,8 @@ export async function seedUserAndStripe() {
 					(price: (typeof stripePrices)[number]) => price.id,
 				),
 			};
-		},
-	);
+			},
+		);
 
 	const seededProducts = await Promise.all(seedProducts);
 	console.info(`📦 Stripe Products have been successfully created.`);

@@ -43,32 +43,56 @@ export type Currency = (typeof CURRENCIES)[keyof typeof CURRENCIES];
  */
 export const PRICING_PLANS = {
 	[PLANS.FREE]: {
-		id: PLANS.FREE,
+		id: "16b794cd-74e6-4eed-97ad-abd30a210daf",
 		name: "Free",
 		description: "Start with the basics, upgrade anytime.",
 		prices: {
 			[INTERVALS.MONTH]: {
-				[CURRENCIES.USD]: 0,
-				[CURRENCIES.EUR]: 0,
+				[CURRENCIES.USD]: {
+					price: 0,
+					price_id: "fcdbd8ec-50c3-4635-adbc-395a420be255",
+				},
+				[CURRENCIES.EUR]: {
+					price: 0,
+					price_id: "cc85bc75-da12-4dd1-88bf-0fedab159403",
+				},
 			},
 			[INTERVALS.YEAR]: {
-				[CURRENCIES.USD]: 0,
-				[CURRENCIES.EUR]: 0,
+				[CURRENCIES.USD]: {
+					price: 0,
+					price_id: "c13ef319-469d-4099-83de-f90d194160af",
+				},
+				[CURRENCIES.EUR]: {
+					price: 0,
+					price_id: "622bfa05-3202-4007-a46b-216e6149f0de",
+				},
 			},
 		},
 	},
 	[PLANS.PRO]: {
-		id: PLANS.PRO,
+		id: "1c2d22c7-7302-4c01-8866-12da71cf3e44",
 		name: "Pro",
 		description: "Access to all features and unlimited projects.",
 		prices: {
 			[INTERVALS.MONTH]: {
-				[CURRENCIES.USD]: 1990,
-				[CURRENCIES.EUR]: 1990,
+				[CURRENCIES.USD]: {
+					price: 1990,
+					price_id: "f0dd1077-c8ae-4e23-a2c9-0e4a405a81d7",
+				},
+				[CURRENCIES.EUR]: {
+					price: 1990,
+					price_id: "c1be9b16-e5f9-44f3-8230-344b65ee2059",
+				},
 			},
 			[INTERVALS.YEAR]: {
-				[CURRENCIES.USD]: 19990,
-				[CURRENCIES.EUR]: 19990,
+				[CURRENCIES.USD]: {
+					price: 19990,
+					price_id: "1e572bfd-56b3-49ac-bae1-f338ab551be5",
+				},
+				[CURRENCIES.EUR]: {
+					price: 19990,
+					price_id: "8e49547c-799f-40f2-a723-56c2a8569283",
+				},
 			},
 		},
 	},
@@ -82,7 +106,10 @@ type PriceInterval<
 	C extends Currency = Currency,
 > = {
 	[interval in I]: {
-		[currency in C]: Price["amount"];
+		[currency in C]: {
+			price: Price["amount"];
+			price_id: Price["price_id"];
+		};
 	};
 };
 

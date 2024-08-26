@@ -1,0 +1,1 @@
+ALTER TABLE "prices" ADD COLUMN "price_id" varchar(36) NOT NULL;

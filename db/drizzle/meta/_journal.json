@@ -92,6 +92,13 @@
       "when": 1724276264356,
       "tag": "0012_blue_rhodey",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1724685129420,
+      "tag": "0013_unknown_earthquake",
+      "breakpoints": true
     }
   ]
 }

@@ -223,6 +223,7 @@ export const prices = pgTable(
 	{
 		id: uuid("id").defaultRandom().primaryKey(),
 		plan_id: uuid("plan_id").notNull(),
+		price_id: varchar("price_id", { length: 36 }).notNull(),
 		amount: integer("amount").notNull(),
 		currency: varchar("currency", { length: 255 }).notNull(),
 		interval: varchar("interval", { length: 255 }).notNull(),

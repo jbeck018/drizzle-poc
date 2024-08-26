@@ -18,7 +18,7 @@
 		"studio": "drizzle-kit studio --config=./db/drizzle.config.ts --port 4983 --verbose",
 		"push": "drizzle-kit push --config ./db/drizzle.config.ts",
 		"up": "drizzle-kit up --config ./db/drizzle.config.ts",
-		"start:stripe": "stripe listen --forward-to localhost:5000/api/webhook"
+		"start:stripe": "stripe listen --forward-to localhost:${SERVER_PORT:5000}/api/webhook"
 	},
 	"dependencies": {
 		"@bogeychan/elysia-logger": "^0.1.1",
