@@ -137,6 +137,6 @@ app.all(
 // app.use(yoga.graphqlEndpoint, yoga);
 
 //Start it!
-app.listen(5000, () => {
-	console.log("App listening on http://localhost:5000");
+app.listen(process.env.SERVER_PORT || 5000, () => {
+	console.log(`App listening on http://localhost:${process.env.SERVER_PORT || 5000}`);
 });
