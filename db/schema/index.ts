@@ -48,8 +48,14 @@ export const users = pgTable(
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({
-	image: one(user_images),
-	subscription: one(subscriptions),
+	image: one(user_images, {
+		fields: [users.id],
+		references: [user_images.user_id],
+	}),
+	subscription: one(subscriptions, {
+		fields: [users.id],
+		references: [subscriptions.user_id],
+	}),
 	usersToRoles: many(usersToRoles),
 	roles: many(usersToRoles),
 }));
