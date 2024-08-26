@@ -388,8 +388,14 @@ export const property_changes = pgTable(
     {
         id: serial("id").primaryKey(),
         property_id: integer("property_id").notNull(),
-        old_value: text("old_value"),
-        new_value: text("new_value"),
+        old_text_value: varchar("old_text_value", { length: 65535 }),
+        new_text_value: varchar("new_text_value", { length: 65535 }),
+        old_date_value: timestamp("old_date_value", { withTimezone: false }),
+        new_date_value: timestamp("new_date_value", { withTimezone: false }),
+        old_boolean_value: boolean("old_boolean_value"),
+        new_boolean_value: boolean("new_boolean_value"),
+        old_number_value: numeric("old_number_value", { precision: 30, scale: 2 }),
+        new_number_value: numeric("new_number_value", { precision: 30, scale: 2 }),
         changed_at: timestamp("changed_at").notNull().defaultNow(),
     },
     (table) => ({
