@@ -381,3 +381,35 @@ export const recordPropertiesJson = sql<{
 	record_id: number;
 	properties: JSON;
 }>`SELECT * FROM record_properties_json`.as('record_properties_json');
+
+// Property Changes Table
+export const property_changes = pgTable(
+    "property_changes",
+    {
+        id: serial("id").primaryKey(),
+        property_id: integer("property_id").notNull(),
+        old_text_value: varchar("old_text_value", { length: 65535 }),
+        new_text_value: varchar("new_text_value", { length: 65535 }),
+        old_date_value: timestamp("old_date_value", { withTimezone: false }),
+        new_date_value: timestamp("new_date_value", { withTimezone: false }),
+        old_boolean_value: boolean("old_boolean_value"),
+        new_boolean_value: boolean("new_boolean_value"),
+        old_number_value: numeric("old_number_value", { precision: 30, scale: 2 }),
+        new_number_value: numeric("new_number_value", { precision: 30, scale: 2 }),
+        changed_at: timestamp("changed_at").notNull().defaultNow(),
+    },
+    (table) => ({
+        property_id_idx: index("property_id_idx").on(table.property_id),
+    }),
+);
+
+export const propertyChangesRelations = relations(property_changes, ({ one }) => ({
+    property: one(properties, {
+        fields: [property_changes.property_id],
+        references: [properties.id],
+    }),
+}));
+
+export const propertyChangesSchema = createSelectSchema(property_changes);
+export type PropertyChange = InferSelectModel<typeof property_changes>;
+export type CreatePropertyChange = InferInsertModel<typeof property_changes>;
