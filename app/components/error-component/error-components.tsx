@@ -14,7 +14,12 @@ const Description = styled.p`
     text-overflow: wrap;
 `
 
-export const ErrorComponent = ({ header, text }: { header: string, text: string }) => {
+export type ErrorComponentProps = {
+    header: string;
+    text: string;
+};
+
+export const ErrorComponent = ({ header, text }: ErrorComponentProps) => {
     return(
         <ErrorContainer>
             <h3>{header}</h3>

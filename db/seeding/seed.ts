@@ -205,11 +205,11 @@ const seed = async () => {
 };
 
 // seed();
-seedAccounts().catch((err: unknown) => {
-	console.error(err);
-	process.exit(1);
-});
-// seedUserAndStripe().catch((err: unknown) => {
+// seedAccounts().catch((err: unknown) => {
 // 	console.error(err);
 // 	process.exit(1);
 // });
+seedUserAndStripe().catch((err: unknown) => {
+	console.error(err);
+	process.exit(1);
+});
