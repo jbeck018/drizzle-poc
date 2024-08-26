@@ -381,3 +381,67 @@ export const recordPropertiesJson = sql<{
 	record_id: number;
 	properties: JSON;
 }>`SELECT * FROM record_properties_json`.as('record_properties_json');
+
+// Property Changes Table
+export const property_changes = pgTable(
+    "property_changes",
+    {
+        id: serial("id").primaryKey(),
+        property_id: integer("property_id").notNull(),
+        old_value: text("old_value"),
+        new_value: text("new_value"),
+        changed_at: timestamp("changed_at").notNull().defaultNow(),
+    },
+    (table) => ({
+        property_id_idx: index("property_id_idx").on(table.property_id),
+    }),
+);
+
+export const propertyChangesRelations = relations(property_changes, ({ one }) => ({
+    property: one(properties, {
+        fields: [property_changes.property_id],
+        references: [properties.id],
+    }),
+}));
+
+export const propertyChangesSchema = createSelectSchema(property_changes);
+export type PropertyChange = InferSelectModel<typeof property_changes>;
+export type CreatePropertyChange = InferInsertModel<typeof property_changes>;
+
+// ... rest of the existing code ...
+
+// SQL for creating triggers (to be executed separately)
+// const createTriggers = sql`
+// CREATE OR REPLACE FUNCTION track_property_changes()
+// RETURNS TRIGGER AS $$
+// BEGIN
+//     IF (TG_OP = 'UPDATE') THEN
+//         INSERT INTO property_changes (property_id, old_value, new_value)
+//         VALUES (
+//             OLD.id,
+//             COALESCE(OLD.text_value, OLD.date_value::text, OLD.boolean_value::text, OLD.number_value::text),
+//             COALESCE(NEW.text_value, NEW.date_value::text, NEW.boolean_value::text, NEW.number_value::text)
+//         );
+//     END IF;
+//     RETURN NEW;
+// END;
+// $$ LANGUAGE plpgsql;
+
+// CREATE TRIGGER property_changes_trigger
+// AFTER UPDATE ON properties
+// FOR EACH ROW
+// EXECUTE FUNCTION track_property_changes();
+
+// CREATE OR REPLACE FUNCTION delete_property_changes()
+// RETURNS TRIGGER AS $$
+// BEGIN
+//     DELETE FROM property_changes WHERE property_id = OLD.id;
+//     RETURN OLD;
+// END;
+// $$ LANGUAGE plpgsql;
+
+// CREATE TRIGGER delete_property_changes_trigger
+// BEFORE DELETE ON properties
+// FOR EACH ROW
+// EXECUTE FUNCTION delete_property_changes();
+// `;
