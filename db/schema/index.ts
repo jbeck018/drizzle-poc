@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { sql } from "drizzle-orm";
 
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
 	dataType() {
@@ -48,8 +49,14 @@ export const users = pgTable(
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({
-	image: one(user_images),
-	subscription: one(subscriptions),
+	image: one(user_images, {
+		fields: [users.id],
+		references: [user_images.user_id],
+	}),
+	subscription: one(subscriptions, {
+		fields: [users.id],
+		references: [subscriptions.user_id],
+	}),
 	usersToRoles: many(usersToRoles),
 	roles: many(usersToRoles),
 }));
@@ -369,3 +376,8 @@ export const propertiesRelations = relations(properties, ({ one }) => ({
 export const propertiesSchema = createSelectSchema(properties);
 export type Property = InferSelectModel<typeof properties>;
 export type CreateProperty = InferInsertModel<typeof properties>;
+
+export const recordPropertiesJson = sql<{
+	record_id: number;
+	properties: JSON;
+}>`SELECT * FROM record_properties_json`.as('record_properties_json');
