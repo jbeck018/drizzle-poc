@@ -3,8 +3,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ListContainerWithSearch } from './list-container-with-search';
 
 const meta: Meta<typeof ListContainerWithSearch> = {
-    component: ListContainerWithSearch,
-  };
+  title: 'Components/ListContainerWithSearch',
+  component: ListContainerWithSearch,
+  tags: ['autodocs'],
+};
    
   export default meta;
   type Story = StoryObj<typeof ListContainerWithSearch>;

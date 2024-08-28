@@ -9,5 +9,5 @@ export type TableProps<T> = {
 };
 
 export type BaseTableData = Record & {
-	properties: Property[];
+	[x: string]: Property;
 };
