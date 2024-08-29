@@ -39,13 +39,11 @@ export const Accounts = () => {
     }, [searchTerm])
 
     const { data: accounts, isLoading, loadData } = useLoadFetcherData<typeof loader>({ url: `${ROUTE_PATH}` });
-    console.log(accounts);
     const variables = useMemo(() => ({ query: searchTerm || '' }), [searchTerm]);
 
     useEffect(() => {
         loadData(variables);
-    }, [searchTerm])
-
+    }, [variables])
     return (
         <ListContainerWithSearch searchTerm={searchTerm} onChange={setSearchTerm}>
             {isLoading ? <TableSkeleton count={30} /> : (
