@@ -15,7 +15,7 @@ const MultiSelectWithLoader: React.FC<{ recordType: string, propertyKey: string 
     if (recordType && propertyKey) {
       loadData({ recordType, propertyKey, page: page.toString(), pageSize: '10', search: inputValue });
       if (data) {
-        return data.map((option) => ({ value: option, label: option }));
+        return data.map((option) => ({ value: option.key, label: option.key }));
       }
     }
     return [];

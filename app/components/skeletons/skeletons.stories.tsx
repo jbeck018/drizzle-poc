@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CardSkeletonList } from './card-skeletons';
+import { CardSkeletonList } from './skeletons';
 
 const meta: Meta<typeof CardSkeletonList> = {
   title: 'Components/Skeletons',

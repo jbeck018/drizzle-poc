@@ -12,6 +12,7 @@ async function getUniquePropertyValues(
   const offset = (page - 1) * pageSize;
 
   const query = db.selectDistinct({
+    id: properties.id,
     key: properties.text_value,
   })
   .from(properties)
@@ -22,7 +23,7 @@ async function getUniquePropertyValues(
 
   const result = await query.execute();
 
-  return result.map((item) => item.key);
+  return result;
 }
 
 export const loader = async (remixContext: LoaderFunctionArgs) => {
