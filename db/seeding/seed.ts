@@ -9,6 +9,10 @@ import {
 	// users,
 } from "../schema";
 import { seedUserAndStripe } from "./admin-stripe-seed";
+import dotenv from 'dotenv';
+import { removeSalesforceData, seedSalesforceAccounts, seedSalesforceData } from "./salesforce-seed";
+
+dotenv.config();
 
 function getRandomInt(max: number) {
 	return Math.floor(Math.random() * max);
@@ -160,56 +164,18 @@ const insertAccountProperties = async (
 	);
 };
 
+
+// Modify the main seed function to include the new seeder
 const seed = async () => {
-	console.log("Migrated this to use the strip seeder....");
-	// const userData = [...Array.from(Array(10000).keys())].map(i => {
-	//     faker.seed(i);
-	//     const firstName = faker.person.firstName();
-	//     const lastName = faker.person.lastName();
-	//     return {
-	//         email: faker.internet.email({ firstName, lastName }),
-	//         firstName,
-	//         lastName,
-	//         phoneNumber: faker.phone.number(),
-	//         image: faker.image.avatar(),
-	//     };
-	// });
-
-	// console.log(userData.length);
-
-	// await db.delete(users);
-
-	// const insertedUsers = await db.insert(users).values(uniqBy(userData, 'email')).returning({ id: users.id });;
-	// console.log(`Inserted ${insertedUsers.length} Users`);
-
-	// const generateEventType = (index: number) => eventTypeEnumValues[index % 6];
-	// const generateEvents = (user: { id: number }, count: number) => [...Array.from(Array(count).keys())].map((_, index) => {
-	//     faker.seed(index);
-	//     return {
-	//         userId: user.id,
-	//         content: faker.word.words({ count: getRandomInt(10) }),
-	//         eventType: generateEventType(index),
-	//         url: faker.internet.url(),
-	//     };
-	// })
-
-	// const eventData = insertedUsers.flatMap(user => generateEvents(user, getRandomInt(50)));
-	// console.log(eventData.length);
-	// console.log(eventData[0]);
-	// await db.delete(events);
-	// await Promise.all(
-	//     chunk(eventData, 10000).map(async (data) => await db.insert(events).values(data))
-	// )
-	// console.log('Events Inserted');
-	return;
+	console.log("Seeding data...");
+	// await seedUserAndStripe();
+	await seedSalesforceData();
+	// await removeSalesforceData();
+	console.log("Seeding completed.");
 };
 
-// seed();
-// seedAccounts().catch((err: unknown) => {
-// 	console.error(err);
-// 	process.exit(1);
-// });
-seedUserAndStripe().catch((err: unknown) => {
+// Update the main execution
+seed().catch((err: unknown) => {
 	console.error(err);
 	process.exit(1);
 });
