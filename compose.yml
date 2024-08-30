@@ -2,18 +2,70 @@ services:
   postgres:
     container_name: postgres-drizzle
     image: postgres
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=graphql
     ports:
       - 5432:5432
-  # postgres:
-  #   container_name: hydra-drizzle
-  #   image: ghcr.io/hydradatabase/hydra:latest
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DB=graphql
-  #   ports:
-  #     - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "postgres", "-U", "postgres"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+  temporal:
+    container_name: temporal
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PWD=postgres
+      - POSTGRES_SEEDS=postgres
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    image: temporalio/auto-setup
+    ports:
+      - 7233:7233
+    volumes:
+      - ./volumes/temporal-dynamicconfig:/etc/temporal/config/dynamicconfig
+    labels:
+      kompose.volume.type: configMap
+
+  temporal-admin-tools:
+    container_name: temporal-admin-tools
+    restart: unless-stopped
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_SHOW_STACKS=1
+    image: temporalio/admin-tools
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD", "tctl", "workflow", "list"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+  temporal-ui:
+    container_name: temporal-ui
+    restart: unless-stopped
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+      - TEMPORAL_CSRF_COOKIE_INSECURE=true
+    image: temporalio/ui
+    ports:
+      - 8085:8080
