@@ -127,11 +127,6 @@ app.all(
 //Graphql
 // app.use(yoga.graphqlEndpoint, yoga);
 
-//Start it!
-app.listen(process.env.SERVER_PORT || 5000, () => {
-	console.log(`App listening on http://localhost:${process.env.SERVER_PORT || 5000}`);
-});
-
 const connection = await Connection.connect({
 	address: 'localhost:7233',
 	tls: process.env.NODE_ENV === 'production' ? true : false,
@@ -164,6 +159,6 @@ app.post('/trigger-sync', async (req, res) => {
 });
 
 //Start it!
-app.listen(3000, () => {
-  console.log(`Server running at http://localhost:3000`);
+app.listen(process.env.SERVER_PORT || 5000, () => {
+	console.log(`App listening on http://localhost:${process.env.SERVER_PORT || 5000}`);
 });
