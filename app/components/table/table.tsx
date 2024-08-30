@@ -36,7 +36,7 @@ export function DataTable<T extends Omit<Record, 'record_type'>>({ data, columns
     estimateSize: index => visibleColumns[index].getSize(),
     getScrollElement: () => tableContainerRef.current,
     horizontal: true,
-    overscan: visibleColumns.length,
+    overscan: 10,
   })
 
   const rowVirtualizer = useVirtualizer({
@@ -48,7 +48,7 @@ export function DataTable<T extends Omit<Record, 'record_type'>>({ data, columns
       navigator.userAgent.indexOf('Firefox') === -1
         ? element => element?.getBoundingClientRect().height
         : undefined,
-    overscan: rows.length,
+    overscan: 10,
   })
 
   const virtualColumns = columnVirtualizer.getVirtualItems()

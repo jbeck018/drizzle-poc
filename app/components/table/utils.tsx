@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { startCase } from "lodash-es";
-import { Property, property_type_zod_enum } from "#db/schema";
+import { omit, startCase } from "lodash-es";
+import { property_type_zod_enum } from "#db/schema";
 import { BaseTableData } from "./types";
 
 export const baseTableColumnHelper = createColumnHelper<BaseTableData>();
@@ -23,33 +23,43 @@ export const createBaseTableColumns = (data: BaseTableData): ColumnDef<BaseTable
         header: () => <Span>ID</Span>,
         size: 50,
     },
-	...data.properties.map(property => ({
-        [property_type_zod_enum.enum.text]: {
-            id: `${property.id}`,
-            cell: () => <Span>{property.text_value}</Span>,
-            header: () => <Span>{startCase(property?.key || '')}</Span>,
+    ...Object.entries(omit(data, ['id', 'created_at', 'updated_at', 'record_type'])).map(([key, property]) => {
+        const columnDef = {
+            id: key,
+            header: () => <Span>{startCase(key || '')}</Span>,
             size: 250,
-        },
-        [property_type_zod_enum.enum.boolean]: {
-            accessorFn: (row: Property) => row.boolean_value || '',
-            id: `${property.id}`,
-            cell: () => <Span>{`${property?.boolean_value || ''}`}</Span>,
-            header: () => <Span>{startCase(property?.key || '')}</Span>,
-            size: 250,
-        },
-        [property_type_zod_enum.enum.date]: {
-            accessorFn: (row: Property) => row.date_value || '',
-            id: `${property.id}`,
-            cell: () => <Span>{property.date_value ? new Intl.DateTimeFormat().format(property.date_value) : ''}</Span>,
-            header: () => <Span>{startCase(property?.key || '')}</Span>,
-            size: 250,
-        },
-        [property_type_zod_enum.enum.number]: {
-            accessorFn: (row: Property) => row.number_value || '',
-            id: `${property.id}`,
-            cell: () => <Span>{String(property.number_value || '0')}</Span>,
-            header: () => <Span>{startCase(property?.key || '')}</Span>,
-            size: 250,
-        },
-    }[property.property_type]))
+        };
+
+        switch (property.property_type) {
+            case property_type_zod_enum.enum.text:
+                return {
+                    ...columnDef,
+                    accessorFn: (row: BaseTableData) => row[key]?.text_value || '',
+                    cell: (info: { getValue: () => any }) => <Span>{info.getValue()}</Span>,
+                };
+            case property_type_zod_enum.enum.boolean:
+                return {
+                    ...columnDef,
+                    accessorFn: (row: BaseTableData) => row[key]?.boolean_value,
+                    cell: (info: { getValue: () => boolean | undefined }) => <Span>{`${info.getValue() ?? ''}`}</Span>,
+                };
+            case property_type_zod_enum.enum.date:
+                return {
+                    ...columnDef,
+                    accessorFn: (row: BaseTableData) => row[key]?.date_value,
+                    cell: (info: { getValue: () => Date | null | undefined }) => {
+                        const value = info.getValue();
+                        return <Span>{value ? new Intl.DateTimeFormat().format(value) : ''}</Span>;
+                    },
+                };
+            case property_type_zod_enum.enum.number:
+                return {
+                    ...columnDef,
+                    accessorFn: (row: BaseTableData) => row[key]?.number_value,
+                    cell: (info: { getValue: () => number | null | undefined }) => <Span>{String(info.getValue() ?? '0')}</Span>,
+                };
+            default:
+                return columnDef;
+        }
+    })
 ]

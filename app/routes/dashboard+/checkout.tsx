@@ -3,7 +3,6 @@ import { json, redirect } from '@remix-run/node'
 import { Link, useLoaderData, useRevalidator } from '@remix-run/react'
 import { AlertTriangle, BadgeCheck, ExternalLink, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { buttonVariants } from '#app/components/ui/button'
 import { requireSessionUser } from '#app/modules/auth/auth.server'
 import { PLANS } from '#app/modules/stripe/plans'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
@@ -87,7 +86,7 @@ export default function DashboardCheckout() {
                 <Link
                   to={DASHBOARD_PATH}
                   prefetch="intent"
-                  className={`${buttonVariants({ variant: 'ghost', size: 'sm' })} gap-2`}>
+                >
                   <span className="text-sm font-medium text-primary/60 group-hover:text-primary">
                     Return to Dashboard
                   </span>
