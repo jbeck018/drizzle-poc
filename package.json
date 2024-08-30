@@ -59,6 +59,7 @@
     "cookie": "^0.6.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
+    "csv-parser": "^3.0.0",
     "drizzle-graphql": "^0.8.5",
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
