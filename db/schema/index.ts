@@ -4,6 +4,7 @@ import {
 	customType,
 	index,
 	integer,
+	jsonb,
 	numeric,
 	pgEnum,
 	pgTable,
@@ -413,3 +414,37 @@ export const propertyChangesRelations = relations(property_changes, ({ one }) =>
 export const propertyChangesSchema = createSelectSchema(property_changes);
 export type PropertyChange = InferSelectModel<typeof property_changes>;
 export type CreatePropertyChange = InferInsertModel<typeof property_changes>;
+
+export const rawRecord = pgTable('raw_record', {
+  id: serial('id').primaryKey(),
+  objectType: varchar('object_type', { length: 255 }).notNull(),
+  externalId: varchar('external_id', { length: 255 }).notNull(),
+  data: jsonb('data').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    objectTypeExternalIdIdx: index('object_type_external_id_idx').on(table.objectType, table.externalId),
+  }
+});
+
+export const associations = pgTable('associations', {
+  id: serial('id').primaryKey(),
+  sourceObjectType: varchar('source_object_type', { length: 255 }).notNull(),
+  sourceExternalId: varchar('source_external_id', { length: 255 }).notNull(),
+  targetObjectType: varchar('target_object_type', { length: 255 }).notNull(),
+  targetExternalId: varchar('target_external_id', { length: 255 }).notNull(),
+  associationType: varchar('association_type', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    sourceTargetIdx: index('source_target_idx').on(
+      table.sourceObjectType, 
+      table.sourceExternalId, 
+      table.targetObjectType, 
+      table.targetExternalId,
+      table.associationType
+    ),
+  }
+});

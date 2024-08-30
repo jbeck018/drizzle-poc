@@ -1,4 +1,3 @@
-// const { schema } = buildSchema(db);
 import crypto from "crypto";
 import { createRequestHandler } from "@remix-run/express";
 import { installGlobals } from "@remix-run/node";
@@ -7,20 +6,13 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import pino from "pino-http";
-// import { buildSchema } from "drizzle-graphql";
-// import { createYoga } from "graphql-yoga";
 import { db } from "../db/db.server";
+import { Connection, Client } from '@temporalio/client';
+import { syncSalesforceWorkflow } from '../temporal/data-syncing/workflows/sync-workflow';
 
 installGlobals();
 
 const NODE_ENV = process.env.NODE_ENV ?? "development";
-
-// const yoga = createYoga({
-// 	schema,
-// 	graphqlEndpoint: "/graphql",
-// 	graphiql: true,
-// 	batching: { limit: 5 },
-// });
 
 const viteDevServer =
 	process.env.NODE_ENV === "production"
@@ -139,4 +131,34 @@ app.all(
 //Start it!
 app.listen(process.env.SERVER_PORT || 5000, () => {
 	console.log(`App listening on http://localhost:${process.env.SERVER_PORT || 5000}`);
+});
+
+const temporalClient = new Client({
+  connection: Connection.connect({ address: 'localhost:7233' }),
+});
+
+app.post('/trigger-sync', async (req, res) => {
+  const { objectType } = req.body;
+
+  if (!objectType) {
+    return res.status(400).json({ error: 'Object type is required' });
+  }
+
+  try {
+    await temporalClient.workflow.start(syncSalesforceWorkflow, {
+      args: [objectType],
+      taskQueue: 'salesforce-sync',
+      workflowId: `salesforce-sync-${objectType}-${Date.now()}`,
+    });
+
+    res.json({ message: `Sync started for ${objectType}` });
+  } catch (error) {
+    console.error('Error starting workflow:', error);
+    res.status(500).json({ error: 'Failed to start sync workflow' });
+  }
+});
+
+//Start it!
+app.listen(3000, () => {
+  console.log(`Server running at http://localhost:3000`);
 });
