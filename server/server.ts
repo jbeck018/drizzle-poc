@@ -6,9 +6,8 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import pino from "pino-http";
-import { db } from "../db/db.server";
 import { Connection, Client } from '@temporalio/client';
-import { syncSalesforceWorkflow } from '../temporal/data-syncing/workflows/sync-workflow';
+import { syncSalesforceData } from '../temporal/data-syncing/workflows/sync-workflow';
 
 installGlobals();
 
@@ -133,8 +132,14 @@ app.listen(process.env.SERVER_PORT || 5000, () => {
 	console.log(`App listening on http://localhost:${process.env.SERVER_PORT || 5000}`);
 });
 
+const connection = await Connection.connect({
+	address: 'localhost:7233',
+	tls: process.env.NODE_ENV === 'production' ? true : false,
+  });
+
 const temporalClient = new Client({
-  connection: Connection.connect({ address: 'localhost:7233' }),
+  connection,
+  namespace: 'default',
 });
 
 app.post('/trigger-sync', async (req, res) => {
@@ -145,7 +150,7 @@ app.post('/trigger-sync', async (req, res) => {
   }
 
   try {
-    await temporalClient.workflow.start(syncSalesforceWorkflow, {
+    await temporalClient.workflow.start(syncSalesforceData, {
       args: [objectType],
       taskQueue: 'salesforce-sync',
       workflowId: `salesforce-sync-${objectType}-${Date.now()}`,
