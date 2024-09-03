@@ -1,9 +1,7 @@
-import { Image } from '@chakra-ui/react'
+import { Button, Image } from '@chakra-ui/react'
 import { Link, useLocation, useNavigate, useSubmit } from '@remix-run/react'
 import { Check, ChevronDown, ChevronUp, LogOut, Settings, Slash } from 'lucide-react'
 import Logo from '#app/assets/logo.png'
-import { LanguageSwitcher } from '#app/components/misc/language-switcher'
-import { Button, buttonVariants } from '#app/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +15,7 @@ import { ROUTE_PATH as LOGOUT_PATH } from '#app/routes/auth+/logout'
 import { ROUTE_PATH as DASHBOARD_PATH } from '#app/routes/dashboard+/_layout'
 import { ROUTE_PATH as DASHBOARD_SETTINGS_PATH } from '#app/routes/dashboard+/settings'
 import { ROUTE_PATH as DASHBOARD_SETTINGS_BILLING_PATH } from '#app/routes/dashboard+/settings.billing'
-import { cn, getUserImgSrc } from '#app/utils/misc'
+import { getUserImgSrc } from '#app/utils/misc'
 import { Role, User, UserImage } from '#db/schema'
 
 /**
@@ -127,9 +125,7 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
         <div className="flex h-10 items-center gap-3">
           <a
             href="https://github.com/dev-xo/remix-saas/tree/main/docs#welcome-to-%EF%B8%8F-remix-saas-documentation"
-            className={cn(
-              `${buttonVariants({ variant: 'outline', size: 'sm' })} group hidden h-8 gap-2 rounded-full bg-transparent px-2 pr-2.5 md:flex`,
-            )}>
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-primary"
@@ -174,16 +170,6 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
                 <Settings className="h-[18px] w-[18px] stroke-[1.5px] text-primary/60 group-hover:text-primary group-focus:text-primary" />
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                className={cn(
-                  'group flex h-9 justify-between rounded-md px-2 hover:bg-transparent',
-                )}>
-                <span className="w-full text-sm text-primary/60 group-hover:text-primary group-focus:text-primary">
-                  Language
-                </span>
-                <LanguageSwitcher />
-              </DropdownMenuItem>
-
               <DropdownMenuSeparator className="mx-0 my-2" />
 
               <DropdownMenuItem
@@ -205,9 +191,7 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
           <Link
             to={DASHBOARD_PATH}
             prefetch="intent"
-            className={cn(
-              `${buttonVariants({ variant: 'ghost', size: 'sm' })} text-primary/80`,
-            )}>
+          >
             Dashboard
           </Link>
         </div>
@@ -216,9 +200,7 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
           <Link
             to={DASHBOARD_SETTINGS_PATH}
             prefetch="intent"
-            className={cn(
-              `${buttonVariants({ variant: 'ghost', size: 'sm' })} text-primary/80`,
-            )}>
+          >
             Settings
           </Link>
         </div>
@@ -227,9 +209,7 @@ export function TopNavigation({ user, plan_id }: NavigationProps) {
           <Link
             to={DASHBOARD_SETTINGS_BILLING_PATH}
             prefetch="intent"
-            className={cn(
-              `${buttonVariants({ variant: 'ghost', size: 'sm' })} text-primary/80`,
-            )}>
+          >
             Billing
           </Link>
         </div>

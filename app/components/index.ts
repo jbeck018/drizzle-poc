@@ -6,3 +6,4 @@ export * from "./toaster";
 export * from "./header";
 export * from "./ui";
 export * from "./table";
+export * from './date-picker';

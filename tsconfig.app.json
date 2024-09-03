@@ -29,6 +29,6 @@
       "#*": ["./*"]
     }
   },
-  "include": ["remix.env.d.ts", "app", "db", "temporal", "graphql"],
+  "include": ["remix.env.d.ts", "app", "db", "temporal", ".storybook"],
   "exclude": ["db/drizzle"]
 }
